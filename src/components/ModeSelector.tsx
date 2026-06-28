@@ -17,13 +17,16 @@ export function ModeSelector({ grade, onSelectMode, onBack }: ModeSelectorProps)
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🥋</div>
           <h2 className="text-2xl font-bold text-gray-800">{grade.name}</h2>
-          <p className="text-gray-500 mt-1">{grade.questions.length} Begriffe</p>
+          <p className="text-gray-500 mt-1" data-testid="technique-count">
+            {grade.techniques.length} Begriffe
+          </p>
         </div>
 
         <div className="flex flex-col gap-4">
           <button
             onClick={() => onSelectMode('term-to-meaning')}
             className="bg-white border-2 border-gray-200 rounded-2xl p-5 text-left shadow-sm active:bg-gray-50 transition"
+            data-testid="mode-term-to-meaning"
           >
             <div className="text-2xl mb-2">🇯🇵 → 🇩🇪</div>
             <div className="font-semibold text-gray-800">Japanisch → Deutsch</div>
@@ -35,6 +38,7 @@ export function ModeSelector({ grade, onSelectMode, onBack }: ModeSelectorProps)
           <button
             onClick={() => onSelectMode('meaning-to-term')}
             className="bg-white border-2 border-gray-200 rounded-2xl p-5 text-left shadow-sm active:bg-gray-50 transition"
+            data-testid="mode-meaning-to-term"
           >
             <div className="text-2xl mb-2">🇩🇪 → 🇯🇵</div>
             <div className="font-semibold text-gray-800">Deutsch → Japanisch</div>

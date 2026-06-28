@@ -14,23 +14,18 @@ export function GradeSelector({ grades, onSelect }: GradeSelectorProps) {
         <p className="text-gray-500">Wähle deinen Gürtelgrad zum Üben</p>
       </div>
 
-      <div className="flex flex-col gap-4 w-full max-w-sm">
+      <div className="flex flex-col gap-3 w-full max-w-sm">
         {grades.map((grade) => (
           <button
             key={grade.id}
             onClick={() => onSelect(grade)}
-            className={`${grade.color} text-white font-semibold text-lg py-5 px-6 rounded-2xl shadow-md active:scale-95 transition-transform`}
+            className={`${grade.bgColor} ${grade.textColor} font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-95 transition-transform text-left`}
+            data-testid={`grade-btn-${grade.id}`}
           >
-            {grade.name}
+            <div className="font-bold">{grade.name}</div>
+            <div className="text-xs opacity-75 mt-0.5">{grade.subtitle}</div>
           </button>
         ))}
-
-        <div className="mt-4 py-5 px-6 rounded-2xl bg-gray-200 text-gray-400 font-semibold text-lg text-center cursor-not-allowed">
-          Blauer Gürtel <span className="text-sm font-normal">(bald)</span>
-        </div>
-        <div className="py-5 px-6 rounded-2xl bg-gray-200 text-gray-400 font-semibold text-lg text-center cursor-not-allowed">
-          Brauner Gürtel <span className="text-sm font-normal">(bald)</span>
-        </div>
       </div>
     </div>
   );
