@@ -124,6 +124,6 @@ interface Technique {
 ## Quellen
 
 - [judo.how](https://judo.how/) — Technik-Referenzen
-- [DJB *Anforderungen für Kyu-Grade 2025* (PDF)](https://www.wjv.de/files/2025/Anforderungen_fuer_Kyu-Grade_2025_V2.pdf)
+- [DJB *Anforderungen für Kyu-Grade 2025* (PDF)](https://www.judobund.de/service/download-center)
 - [DJB *Kyu-Graduierungssystem Technik-Pools* (PDF)](https://www.judobund.de/service/download-center/19)
 - [DJB Download-Center](https://www.judobund.de/service/download-center) — alle offiziellen Dokumente inkl. Judo-Werte Plakat

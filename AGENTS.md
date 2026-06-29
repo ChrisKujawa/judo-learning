@@ -146,7 +146,7 @@ Both workflows use Node 20 in GitHub Actions (even though local dev targets Node
 ## Data Sources
 
 - [judo.how](https://judo.how/) — technique reference and descriptions
-- [DJB *Anforderungen für Kyu-Grade 2025* (PDF)](https://www.wjv.de/files/2025/Anforderungen_fuer_Kyu-Grade_2025_V2.pdf) — grade requirements per Kyu level
+- [DJB *Anforderungen für Kyu-Grade 2025* (PDF)](https://www.judobund.de/service/download-center)
 - [DJB *Kyu-Graduierungssystem Technik-Pools* (PDF)](https://www.judobund.de/service/download-center/19) — technique pool categorisation (Grundprogramm, Erweiterungsprogramm, etc.)
 - [DJB Download-Center](https://www.judobund.de/service/download-center) — official source for all DJB documents including the Judo-Werte Plakat
 
