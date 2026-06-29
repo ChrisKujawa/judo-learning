@@ -1,8 +1,21 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Quiz } from '../components/Quiz';
-import type { Grade, Technique } from '../data/types';
+import type { Grade, Technique, QuestionType } from '../data/types';
+
+// Module-level closure variable to pin assignQuestionType in deterministic tests.
+// null = use real implementation (default for all other tests)
+let _forcedQuestionType: QuestionType | null = null;
+
+vi.mock('../utils/quiz', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/quiz')>();
+  return {
+    ...actual,
+    assignQuestionType: (t: Technique) =>
+      _forcedQuestionType !== null ? _forcedQuestionType : actual.assignQuestionType(t),
+  };
+});
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
@@ -285,5 +298,72 @@ describe('Quiz – image questions', () => {
       unmount();
     }
     expect(found).toBe(true);
+  });
+});
+
+// ── deterministic question-type tests via mocked assignQuestionType ───────────
+
+function makeImageGradeSingle(): Grade {
+  const techniques: Technique[] = [
+    { id: 'o-goshi', term: 'O-Goshi', meaning: 'Große Hüfte', category: 'Koshi-Waza', introducedAt: 7, imageUrl: 'https://example.com/o-goshi.jpg' },
+    { id: 'uchi-mata', term: 'Uchi-Mata', meaning: 'Innerer Schenkelwurf', category: 'Ashi-Waza', introducedAt: 5, imageUrl: 'https://example.com/uchi-mata.jpg' },
+    { id: 'tai-otoshi', term: 'Tai-Otoshi', meaning: 'Körpersturz', category: 'Te-Waza', introducedAt: 7, imageUrl: 'https://example.com/tai-otoshi.jpg' },
+    { id: 'harai-goshi', term: 'Harai-Goshi', meaning: 'Hüftfeger', category: 'Koshi-Waza', introducedAt: 5, imageUrl: 'https://example.com/harai-goshi.jpg' },
+  ];
+  return { id: 'kyu7', kyu: 7, name: '7. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques };
+}
+
+describe('Quiz – image-to-name (deterministic)', () => {
+  beforeEach(() => { _forcedQuestionType = 'image-to-name'; });
+  afterEach(() => { _forcedQuestionType = null; });
+
+  it('shows "Welche Technik ist das?" as question text', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question').textContent).toBe('Welche Technik ist das?');
+  });
+
+  it('shows "Welche Technik ist das?" as question label', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question-label').textContent).toBe('Welche Technik ist das?');
+  });
+
+  it('correct answer is the Japanese term', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const terms = makeImageGradeSingle().techniques.map((t) => t.term);
+    expect(terms).toContain(correct.textContent?.trim());
+  });
+
+  it('shows German meaning as hint after answering', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    const hint = screen.getByTestId('hint');
+    const meanings = makeImageGradeSingle().techniques.map((t) => t.meaning);
+    expect(meanings.some((m) => hint.textContent?.includes(m))).toBe(true);
+  });
+});
+
+describe('Quiz – term-to-meaning (deterministic)', () => {
+  beforeEach(() => { _forcedQuestionType = 'term-to-meaning'; });
+  afterEach(() => { _forcedQuestionType = null; });
+
+  it('shows "Was bedeutet…?" as question label', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question-label').textContent).toBe('Was bedeutet…?');
+  });
+
+  it('shows the Japanese term as question text', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    const questionText = screen.getByTestId('question').textContent ?? '';
+    const terms = makeGrade().techniques.map((t) => t.term);
+    expect(terms).toContain(questionText);
+  });
+
+  it('correct answer is the German meaning', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const meanings = makeGrade().techniques.map((t) => t.meaning);
+    expect(meanings).toContain(correct.textContent?.trim());
   });
 });
