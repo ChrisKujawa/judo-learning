@@ -18,8 +18,8 @@ describe('App – integration', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    expect(screen.getByTestId('mode-term-to-meaning')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-meaning-to-term')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-btn-term-to-meaning')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-btn-meaning-to-term')).toBeInTheDocument();
   });
 
   it('shows the selected grade name in ModeSelector', async () => {
@@ -33,7 +33,7 @@ describe('App – integration', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    await user.click(screen.getByTestId('mode-term-to-meaning'));
+    await user.click(screen.getByTestId('mode-btn-term-to-meaning'));
     expect(screen.getByTestId('question')).toBeInTheDocument();
   });
 
@@ -41,7 +41,7 @@ describe('App – integration', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    await user.click(screen.getByTestId('mode-meaning-to-term'));
+    await user.click(screen.getByTestId('mode-btn-meaning-to-term'));
     expect(screen.getByTestId('question')).toBeInTheDocument();
   });
 
@@ -57,17 +57,17 @@ describe('App – integration', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    await user.click(screen.getByTestId('mode-term-to-meaning'));
+    await user.click(screen.getByTestId('mode-btn-term-to-meaning'));
     // Back from quiz
     await user.click(screen.getByText(/Zurück/));
-    expect(screen.getByTestId('mode-term-to-meaning')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-btn-term-to-meaning')).toBeInTheDocument();
   });
 
   it('can complete a full quiz flow without errors', async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    await user.click(screen.getByTestId('mode-term-to-meaning'));
+    await user.click(screen.getByTestId('mode-btn-term-to-meaning'));
 
     // Answer all questions with the correct choice
     while (!screen.queryByText('Quiz beendet!')) {
@@ -82,13 +82,13 @@ describe('App – integration', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByTestId('grade-btn-kyu8'));
-    await user.click(screen.getByTestId('mode-term-to-meaning'));
+    await user.click(screen.getByTestId('mode-btn-term-to-meaning'));
 
     while (!screen.queryByText('Quiz beendet!')) {
       await user.click(screen.getAllByTestId('choice-correct')[0]);
       await user.click(screen.getByTestId('next-btn'));
     }
     await user.click(screen.getByText('Nochmal üben'));
-    expect(screen.getByTestId('mode-term-to-meaning')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-btn-term-to-meaning')).toBeInTheDocument();
   });
 });

@@ -311,3 +311,47 @@ describe('Quiz – Judo-Werte special mode', () => {
     expect(screen.getByTestId('hint')).toBeInTheDocument();
   });
 });
+
+// ── Pictogram quiz mode ───────────────────────────────────────────────────────
+
+function makePictogramGrade(): Grade {
+  const techniques: Technique[] = [
+    { id: 'o-goshi', term: 'O-Goshi', meaning: 'Große Hüfte', category: 'Koshi-Waza', introducedAt: 7, imageUrl: 'https://example.com/o-goshi.jpg' },
+    { id: 'uchi-mata', term: 'Uchi-Mata', meaning: 'Innerer Schenkelwurf', category: 'Ashi-Waza', introducedAt: 5, imageUrl: 'https://example.com/uchi-mata.jpg' },
+    { id: 'tai-otoshi', term: 'Tai-Otoshi', meaning: 'Körpersturz', category: 'Te-Waza', introducedAt: 7, imageUrl: 'https://example.com/tai-otoshi.jpg' },
+    { id: 'harai-goshi', term: 'Harai-Goshi', meaning: 'Hüftfeger', category: 'Koshi-Waza', introducedAt: 5, imageUrl: 'https://example.com/harai-goshi.jpg' },
+  ];
+  return { id: 'kyu7', kyu: 7, name: '7. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques };
+}
+
+describe('Quiz – pictogram mode', () => {
+  it('shows the technique image instead of text question', () => {
+    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
+    expect(screen.getByTestId('pictogram-image')).toBeInTheDocument();
+  });
+
+  it('shows "Wurfbild erkennen" label', () => {
+    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
+    expect(screen.getByText('Wurfbild erkennen')).toBeInTheDocument();
+  });
+
+  it('correct answer is the Japanese technique term', () => {
+    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const terms = ['O-Goshi', 'Uchi-Mata', 'Tai-Otoshi', 'Harai-Goshi'];
+    expect(terms).toContain(correct.textContent?.trim());
+  });
+
+  it('shows exactly 4 answer choices', () => {
+    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
+    const choicesContainer = screen.getByTestId('choices');
+    expect(within(choicesContainer).getAllByRole('button')).toHaveLength(4);
+  });
+
+  it('increments score when correct answer is selected', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    expect(screen.getByTestId('score').textContent).toContain('1');
+  });
+});

@@ -282,6 +282,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Seitlich; das nach vorne kommende, angehobene Bein wird weggefegt – oben entgegengesetzt drücken.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/de-ashi-harai/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/De-ashi-barai.jpg',
     introducedAt: 7,
   },
   {
@@ -292,6 +293,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Das äußere Standbein von Uke wird von hinten weggesiecht.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/o-soto-gari/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/97/O-soto-gari.jpg',
     introducedAt: 7,
   },
   {
@@ -302,6 +304,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Kniekehle auf Kniekehle – Arm für Druck nutzen.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/o-uchi-gari/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/61/O-uchi-gari.jpg',
     introducedAt: 7,
   },
   {
@@ -312,6 +315,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Mit der Fußsohle sicheln – das Standbein von Uke innen angreifen.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/ko-uchi-gari/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Ko-uchi-gari.jpg',
     introducedAt: 6,
   },
   {
@@ -322,6 +326,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Das vordere Bein von Uke außen angreifen – Sichel oder Haken.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/ko-soto-gari/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/SJJFkosotogari.jpg',
     introducedAt: 5,
   },
   {
@@ -332,6 +337,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Das vordere Bein von Uke am Knöchel sperren und gleichzeitig hochziehen und drücken.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/sasae-tsurikomi-ashi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Sasae-tsuri-komi-ashi.jpg',
     introducedAt: 5,
   },
   {
@@ -342,6 +348,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Ai-Yotsu. Tori dreht ein und hebt den Innenoberschenkel von Uke hoch.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/uchi-mata/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Uchimata-illustration_%28cropped%29.jpg',
     introducedAt: 5,
   },
 
@@ -364,6 +371,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Te-Waza',
     comment: 'Eindrehen, beide Hände greifen – Uke über die Schulter werfen.',
     link: 'https://judo.how/nage-waza/tachi-waza/te-waza/seoi-nage/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Morote-seoi-nage_%28cropped%29.jpg',
     introducedAt: 7,
   },
   {
@@ -374,6 +382,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Te-Waza',
     comment: 'Ein Arm greift unter Ukes Arm durch (gegen den Ellenbogen) – Uke über eine Schulter werfen.',
     link: 'https://judo.how/nage-waza/tachi-waza/te-waza/ippon-seoi-nage/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Ippon_seoi_nage.jpg',
     introducedAt: 7,
   },
   {
@@ -384,6 +393,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Te-Waza',
     comment: 'Ähnlich Seoi-Nage, aber das hintere Bein wird als Hindernis gestellt statt eingedreht.',
     link: 'https://judo.how/nage-waza/tachi-waza/te-waza/tai-otoshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Tai-otoshi-2_%28cropped%29.jpg',
     introducedAt: 7,
   },
 
@@ -406,6 +416,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Grundlegender Hüftwurf – Tori dreht ein und hebt Uke mit der Hüfte über sich.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/o-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/O-goshi.jpg',
     introducedAt: 7,
   },
   {
@@ -416,6 +427,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Ähnlich O-Goshi, aber Ukes Körper rollt an Toris Hüfte entlang – weniger Kontakt.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/uki-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Uki-goshi.jpg',
     introducedAt: 7,
   },
   {
@@ -426,6 +438,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Tori legt den Arm um Ukes Kopf/Nacken und dreht ihn über die Hüfte.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/koshi-guruma/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/26/Koshi-guruma.jpg',
     introducedAt: 6,
   },
   {
@@ -436,6 +449,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Greift den Kragen – zieht Uke nach oben und schmeißt ihn über die Hüfte.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/tsurikomi-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Tsuri-komi-goshi.jpg',
     introducedAt: 5,
   },
   {
@@ -446,6 +460,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Tori befreit den Griff, Uke will nachfassen – Arm wird abgeleitet und Uke wird geworfen.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/sode-tsurikomi-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Sode-tsuri-komi-goshi.jpg',
     introducedAt: 5,
   },
   {
@@ -456,6 +471,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Das Schwungbein fegt Ukes Beine weg, während Tori Uke über die Hüfte dreht.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/harai-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/21/Haraigoshi.jpg',
     introducedAt: 5,
   },
 
@@ -494,6 +510,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ma-Sutemi-Waza',
     comment: 'Ma-Sutemi-Waza. Pflicht bei 3. Kyu. Tori fällt rückwärts und katapultiert Uke über sich.',
     link: 'https://judo.how/nage-waza/sutemi-waza/ma-sutemi-waza/tomoe-nage/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Tomoe-nage_cropped.jpg',
     introducedAt: 3,
   },
   {
@@ -504,6 +521,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ma-Sutemi-Waza',
     comment: 'Ma-Sutemi-Waza. Pflicht bei 2. Kyu. Tori nutzt Ukes Vorwärtsdruck.',
     link: 'https://judo.how/nage-waza/sutemi-waza/ma-sutemi-waza/sumi-gaeshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Sumi-gaeshi.svg',
     introducedAt: 2,
   },
   {

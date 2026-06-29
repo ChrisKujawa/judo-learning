@@ -1,4 +1,4 @@
-export type QuizMode = 'term-to-meaning' | 'meaning-to-term';
+export type QuizMode = 'term-to-meaning' | 'meaning-to-term' | 'pictogram';
 
 export interface Technique {
   id: string;
@@ -11,6 +11,8 @@ export interface Technique {
   /** Pedagogical note / how-to hint shown after answering */
   comment?: string;
   link?: string;
+  /** Wikimedia Commons image URL for pictogram quiz */
+  imageUrl?: string;
   /** First introduced at this Kyu level (8=lowest, 1=highest) */
   introducedAt: number;
 }
