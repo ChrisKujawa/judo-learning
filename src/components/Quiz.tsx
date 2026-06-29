@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { Grade, QuestionType } from '../data/types';
+import type { Grade, Technique, QuestionType } from '../data/types';
 import { shuffle, assignQuestionType, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
 
 interface QuizProps {
@@ -8,7 +8,7 @@ interface QuizProps {
 }
 
 interface Question {
-  technique: (typeof grade.techniques)[number];
+  technique: Technique;
   type: QuestionType;
 }
 
