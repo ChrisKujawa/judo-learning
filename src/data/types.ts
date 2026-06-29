@@ -1,4 +1,5 @@
-export type QuizMode = 'term-to-meaning' | 'meaning-to-term';
+/** How a specific question is presented in the quiz */
+export type QuestionType = 'image-to-name' | 'term-to-meaning' | 'judo-wert';
 
 export interface Technique {
   id: string;
@@ -11,6 +12,8 @@ export interface Technique {
   /** Pedagogical note / how-to hint shown after answering */
   comment?: string;
   link?: string;
+  /** Wikimedia Commons image URL for throw illustrations */
+  imageUrl?: string;
   /** First introduced at this Kyu level (8=lowest, 1=highest) */
   introducedAt: number;
 }
@@ -25,3 +28,4 @@ export interface Grade {
   textColor: string;
   techniques: Technique[];
 }
+

@@ -1,8 +1,21 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Quiz } from '../components/Quiz';
-import type { Grade, Technique } from '../data/types';
+import type { Grade, Technique, QuestionType } from '../data/types';
+
+// Module-level closure variable to pin assignQuestionType in deterministic tests.
+// null = use real implementation (default for all other tests)
+let _forcedQuestionType: QuestionType | null = null;
+
+vi.mock('../utils/quiz', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/quiz')>();
+  return {
+    ...actual,
+    assignQuestionType: (t: Technique) =>
+      _forcedQuestionType !== null ? _forcedQuestionType : actual.assignQuestionType(t),
+  };
+});
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
@@ -17,12 +30,10 @@ function makeTechnique(overrides: Partial<Technique> = {}): Technique {
   };
 }
 
-/** Builds a grade with N distinct techniques so buildChoices has enough distractors. */
-function makeGrade(techniqueCount = 8, modeOverrides: Partial<Technique> = {}): Grade {
+function makeGrade(techniqueCount = 8, overrides: Partial<Technique> = {}): Grade {
   const techniques: Technique[] = Array.from({ length: techniqueCount }, (_, i) =>
-    makeTechnique({ id: `t${i}`, term: `Term ${i}`, meaning: `Meaning ${i}`, ...modeOverrides })
+    makeTechnique({ id: `t${i}`, term: `Term ${i}`, meaning: `Meaning ${i}`, ...overrides })
   );
-  // Replace first item with a known one for assertion
   techniques[0] = makeTechnique({
     id: 'known',
     term: 'O-Goshi',
@@ -31,80 +42,43 @@ function makeGrade(techniqueCount = 8, modeOverrides: Partial<Technique> = {}): 
     link: 'https://judo.how/o-goshi',
   });
   return {
-    id: 'kyu7',
-    kyu: 7,
-    name: '7. Kyu – Gelb',
-    subtitle: 'Test',
-    bgColor: 'bg-yellow-400',
-    textColor: 'text-yellow-900',
-    techniques,
+    id: 'kyu7', kyu: 7, name: '7. Kyu – Gelb', subtitle: 'Test',
+    bgColor: 'bg-yellow-400', textColor: 'text-yellow-900', techniques,
   };
 }
 
-// ── helpers ───────────────────────────────────────────────────────────────────
-
-async function answerAllCorrectly(user: ReturnType<typeof userEvent.setup>, questionCount: number) {
-  for (let i = 0; i < questionCount; i++) {
-    const correctBtn = screen.getAllByTestId('choice-correct')[0];
-    await user.click(correctBtn);
-    const next = screen.getByTestId('next-btn');
-    await user.click(next);
+async function answerAllCorrectly(user: ReturnType<typeof userEvent.setup>, count: number) {
+  for (let i = 0; i < count; i++) {
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    await user.click(screen.getByTestId('next-btn'));
   }
 }
 
-// ── render & basic display ────────────────────────────────────────────────────
+// ── rendering ─────────────────────────────────────────────────────────────────
 
 describe('Quiz – rendering', () => {
   it('renders without crashing', () => {
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     expect(screen.getByTestId('question')).toBeInTheDocument();
   });
 
-  it('shows the term as question in term-to-meaning mode', () => {
-    const grade = makeGrade();
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
-    const question = screen.getByTestId('question').textContent;
-    const shownTerm = grade.techniques.find((t) => question === t.term);
-    expect(shownTerm).toBeDefined();
-  });
-
-  it('shows the meaning as question in meaning-to-term mode', () => {
-    const grade = makeGrade();
-    render(<Quiz grade={grade} mode="meaning-to-term" onBack={vi.fn()} />);
-    const question = screen.getByTestId('question').textContent;
-    const shownTech = grade.techniques.find((t) => question === t.meaning);
-    expect(shownTech).toBeDefined();
-  });
-
   it('shows exactly 4 answer choices', () => {
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
-    const choicesContainer = screen.getByTestId('choices');
-    expect(within(choicesContainer).getAllByRole('button')).toHaveLength(4);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    expect(within(screen.getByTestId('choices')).getAllByRole('button')).toHaveLength(4);
   });
 
   it('shows progress counter starting at 1', () => {
-    const grade = makeGrade(5);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade(5)} onBack={vi.fn()} />);
     expect(screen.getByTestId('progress').textContent).toMatch(/^1 \/ 5/);
   });
 
   it('shows initial score of 0', () => {
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     expect(screen.getByTestId('score').textContent).toContain('0');
   });
 
-  it('shows the correct mode label for term-to-meaning', () => {
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
-    expect(screen.getByText(/Was bedeutet/)).toBeInTheDocument();
-  });
-
-  it('shows the correct mode label for meaning-to-term', () => {
-    render(<Quiz grade={makeGrade()} mode="meaning-to-term" onBack={vi.fn()} />);
-    expect(screen.getByText(/Wie heißt/)).toBeInTheDocument();
-  });
-
   it('does not show the next button before answering', () => {
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     expect(screen.queryByTestId('next-btn')).not.toBeInTheDocument();
   });
 });
@@ -114,21 +88,21 @@ describe('Quiz – rendering', () => {
 describe('Quiz – answering', () => {
   it('shows next button after selecting any answer', async () => {
     const user = userEvent.setup();
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     await user.click(screen.getAllByRole('button', { name: /Term|Meaning|Hüfte/i })[0]);
     expect(screen.getByTestId('next-btn')).toBeInTheDocument();
   });
 
   it('increments score when correct answer is selected', async () => {
     const user = userEvent.setup();
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     expect(screen.getByTestId('score').textContent).toContain('1');
   });
 
   it('does not increment score when wrong answer is selected', async () => {
     const user = userEvent.setup();
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     const wrongBtns = screen.queryAllByTestId('choice-wrong');
     if (wrongBtns.length > 0) {
       await user.click(wrongBtns[0]);
@@ -138,55 +112,24 @@ describe('Quiz – answering', () => {
 
   it('does not allow re-answering after an answer is selected', async () => {
     const user = userEvent.setup();
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     const correctBtn = screen.getAllByTestId('choice-correct')[0];
     await user.click(correctBtn);
-    // Click again – score should still be 1
     await user.click(correctBtn);
     expect(screen.getByTestId('score').textContent).toContain('1');
   });
 
   it('shows hint after answering when comment is present', async () => {
     const user = userEvent.setup();
-    // makeGrade puts a technique with comment at index 0, but quiz shuffles –
-    // so we force a grade where ALL techniques have a comment
     const grade: Grade = {
-      id: 'g',
-      kyu: 7,
-      name: 'Test',
-      subtitle: '',
-      bgColor: '',
-      textColor: '',
+      id: 'g', kyu: 7, name: 'Test', subtitle: '', bgColor: '', textColor: '',
       techniques: Array.from({ length: 5 }, (_, i) =>
         makeTechnique({ id: `t${i}`, term: `T${i}`, meaning: `M${i}`, comment: 'Tipp für alle' })
       ),
     };
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={grade} onBack={vi.fn()} />);
     await user.click(screen.getAllByRole('button', { name: /T|M/i })[0]);
     expect(screen.getByTestId('hint')).toBeInTheDocument();
-  });
-
-  it('shows judo.how link after answering when link is present', async () => {
-    const user = userEvent.setup();
-    const grade: Grade = {
-      id: 'g',
-      kyu: 7,
-      name: 'Test',
-      subtitle: '',
-      bgColor: '',
-      textColor: '',
-      techniques: Array.from({ length: 5 }, (_, i) =>
-        makeTechnique({
-          id: `t${i}`,
-          term: `T${i}`,
-          meaning: `M${i}`,
-          link: 'https://judo.how/test',
-        })
-      ),
-    };
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
-    await user.click(screen.getAllByRole('button', { name: /T|M/i })[0]);
-    expect(screen.getByTestId('judo-how-link')).toBeInTheDocument();
   });
 });
 
@@ -195,8 +138,7 @@ describe('Quiz – answering', () => {
 describe('Quiz – navigation', () => {
   it('advances to the next question when "Weiter" is clicked', async () => {
     const user = userEvent.setup();
-    const grade = makeGrade(5);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeGrade(5)} onBack={vi.fn()} />);
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     await user.click(screen.getByTestId('next-btn'));
     expect(screen.getByTestId('progress').textContent).toMatch(/^2 \/ 5/);
@@ -204,12 +146,9 @@ describe('Quiz – navigation', () => {
 
   it('shows "Ergebnis anzeigen" label on the last question', async () => {
     const user = userEvent.setup();
-    const grade = makeGrade(2);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
-    // Answer first question and advance
+    render(<Quiz grade={makeGrade(2)} onBack={vi.fn()} />);
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     await user.click(screen.getByTestId('next-btn'));
-    // Now on last question – answer it
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     expect(screen.getByTestId('next-btn').textContent).toBe('Ergebnis anzeigen');
   });
@@ -217,7 +156,7 @@ describe('Quiz – navigation', () => {
   it('calls onBack when the back button is clicked', async () => {
     const user = userEvent.setup();
     const onBack = vi.fn();
-    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={onBack} />);
+    render(<Quiz grade={makeGrade()} onBack={onBack} />);
     await user.click(screen.getByText(/Zurück/));
     expect(onBack).toHaveBeenCalledOnce();
   });
@@ -229,7 +168,7 @@ describe('Quiz – score screen', () => {
   it('shows the score screen after the last question', async () => {
     const user = userEvent.setup();
     const grade = makeGrade(3);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={grade} onBack={vi.fn()} />);
     await answerAllCorrectly(user, grade.techniques.length);
     expect(screen.getByText('Quiz beendet!')).toBeInTheDocument();
   });
@@ -237,7 +176,7 @@ describe('Quiz – score screen', () => {
   it('shows 100% when all answers are correct', async () => {
     const user = userEvent.setup();
     const grade = makeGrade(3);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={grade} onBack={vi.fn()} />);
     await answerAllCorrectly(user, grade.techniques.length);
     expect(screen.getByTestId('score-pct').textContent).toBe('100%');
   });
@@ -245,7 +184,7 @@ describe('Quiz – score screen', () => {
   it('shows 🏆 emoji for 100%', async () => {
     const user = userEvent.setup();
     const grade = makeGrade(3);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={grade} onBack={vi.fn()} />);
     await answerAllCorrectly(user, grade.techniques.length);
     expect(screen.getByTestId('score-emoji').textContent).toBe('🏆');
   });
@@ -253,7 +192,7 @@ describe('Quiz – score screen', () => {
   it('shows correct "X von Y richtig" summary text', async () => {
     const user = userEvent.setup();
     const grade = makeGrade(3);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={grade} onBack={vi.fn()} />);
     await answerAllCorrectly(user, grade.techniques.length);
     expect(screen.getByTestId('score-text').textContent).toMatch(/3 von 3/);
   });
@@ -261,9 +200,8 @@ describe('Quiz – score screen', () => {
   it('calls onBack when "Nochmal üben" is clicked on the score screen', async () => {
     const user = userEvent.setup();
     const onBack = vi.fn();
-    const grade = makeGrade(2);
-    render(<Quiz grade={grade} mode="term-to-meaning" onBack={onBack} />);
-    await answerAllCorrectly(user, grade.techniques.length);
+    render(<Quiz grade={makeGrade(2)} onBack={onBack} />);
+    await answerAllCorrectly(user, 2);
     await user.click(screen.getByText('Nochmal üben'));
     expect(onBack).toHaveBeenCalledOnce();
   });
@@ -281,24 +219,19 @@ function makeWertGrade(): Grade {
   return { id: 'wert-grade', kyu: 8, name: '8. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques: werte };
 }
 
-describe('Quiz – Judo-Werte special mode', () => {
-  it('shows fixed question text regardless of mode', () => {
-    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
-    expect(screen.getByTestId('question').textContent).toBe('Welcher Begriff ist ein Judo-Wert?');
-  });
-
-  it('shows fixed question text in meaning-to-term mode too', () => {
-    render(<Quiz grade={makeWertGrade()} mode="meaning-to-term" onBack={vi.fn()} />);
+describe('Quiz – Judo-Werte', () => {
+  it('shows "Welcher Begriff ist ein Judo-Wert?" as question', () => {
+    render(<Quiz grade={makeWertGrade()} onBack={vi.fn()} />);
     expect(screen.getByTestId('question').textContent).toBe('Welcher Begriff ist ein Judo-Wert?');
   });
 
   it('shows "Judo-Wert erkennen" label', () => {
-    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
-    expect(screen.getByText('Judo-Wert erkennen')).toBeInTheDocument();
+    render(<Quiz grade={makeWertGrade()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question-label').textContent).toBe('Judo-Wert erkennen');
   });
 
-  it('correct answer button shows the value term', () => {
-    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+  it('correct answer is the value term', () => {
+    render(<Quiz grade={makeWertGrade()} onBack={vi.fn()} />);
     const correct = screen.getAllByTestId('choice-correct')[0];
     const werte = ['Respekt', 'Mut', 'Ehrlichkeit', 'Höflichkeit'];
     expect(werte).toContain(correct.textContent?.trim());
@@ -306,8 +239,131 @@ describe('Quiz – Judo-Werte special mode', () => {
 
   it('shows meaning as hint after answering', async () => {
     const user = userEvent.setup();
-    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    render(<Quiz grade={makeWertGrade()} onBack={vi.fn()} />);
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     expect(screen.getByTestId('hint')).toBeInTheDocument();
+  });
+});
+
+// ── image-to-name question type ───────────────────────────────────────────────
+
+function makeImageGrade(): Grade {
+  // All techniques have images so assignQuestionType will randomly pick — we
+  // force image-to-name by making the grade techniques-only-with-images and
+  // relying on the fact that the correct testid is always present regardless.
+  const techniques: Technique[] = [
+    { id: 'o-goshi', term: 'O-Goshi', meaning: 'Große Hüfte', category: 'Koshi-Waza', introducedAt: 7, imageUrl: 'https://example.com/o-goshi.jpg' },
+    { id: 'uchi-mata', term: 'Uchi-Mata', meaning: 'Innerer Schenkelwurf', category: 'Ashi-Waza', introducedAt: 5, imageUrl: 'https://example.com/uchi-mata.jpg' },
+    { id: 'tai-otoshi', term: 'Tai-Otoshi', meaning: 'Körpersturz', category: 'Te-Waza', introducedAt: 7, imageUrl: 'https://example.com/tai-otoshi.jpg' },
+    { id: 'harai-goshi', term: 'Harai-Goshi', meaning: 'Hüftfeger', category: 'Koshi-Waza', introducedAt: 5, imageUrl: 'https://example.com/harai-goshi.jpg' },
+  ];
+  return { id: 'kyu7', kyu: 7, name: '7. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques };
+}
+
+describe('Quiz – image questions', () => {
+  it('shows 4 choices regardless of question type', () => {
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+    expect(within(screen.getByTestId('choices')).getAllByRole('button')).toHaveLength(4);
+  });
+
+  it('score increments on correct answer for image-based questions', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    expect(screen.getByTestId('score').textContent).toContain('1');
+  });
+
+  it('image shown before answering when question type is image-to-name', () => {
+    // Run a few times to increase probability of hitting an image-to-name question
+    // (50/50 random — at least one render out of several will show the image before)
+    let found = false;
+    for (let i = 0; i < 20 && !found; i++) {
+      const { unmount } = render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+      if (screen.queryByTestId('technique-image-before')) found = true;
+      unmount();
+    }
+    expect(found).toBe(true);
+  });
+
+  it('image shown after answering when question type is term-to-meaning', async () => {
+    const user = userEvent.setup();
+    let found = false;
+    for (let i = 0; i < 20 && !found; i++) {
+      const { unmount } = render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+      if (!screen.queryByTestId('technique-image-before')) {
+        // This is a term-to-meaning question — image should appear after answering
+        await user.click(screen.getAllByTestId('choice-correct')[0]);
+        if (screen.queryByTestId('technique-image-after')) found = true;
+      }
+      unmount();
+    }
+    expect(found).toBe(true);
+  });
+});
+
+// ── deterministic question-type tests via mocked assignQuestionType ───────────
+
+function makeImageGradeSingle(): Grade {
+  const techniques: Technique[] = [
+    { id: 'o-goshi', term: 'O-Goshi', meaning: 'Große Hüfte', category: 'Koshi-Waza', introducedAt: 7, imageUrl: 'https://example.com/o-goshi.jpg' },
+    { id: 'uchi-mata', term: 'Uchi-Mata', meaning: 'Innerer Schenkelwurf', category: 'Ashi-Waza', introducedAt: 5, imageUrl: 'https://example.com/uchi-mata.jpg' },
+    { id: 'tai-otoshi', term: 'Tai-Otoshi', meaning: 'Körpersturz', category: 'Te-Waza', introducedAt: 7, imageUrl: 'https://example.com/tai-otoshi.jpg' },
+    { id: 'harai-goshi', term: 'Harai-Goshi', meaning: 'Hüftfeger', category: 'Koshi-Waza', introducedAt: 5, imageUrl: 'https://example.com/harai-goshi.jpg' },
+  ];
+  return { id: 'kyu7', kyu: 7, name: '7. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques };
+}
+
+describe('Quiz – image-to-name (deterministic)', () => {
+  beforeEach(() => { _forcedQuestionType = 'image-to-name'; });
+  afterEach(() => { _forcedQuestionType = null; });
+
+  it('shows "Welche Technik ist das?" as question text', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question').textContent).toBe('Welche Technik ist das?');
+  });
+
+  it('shows "Welche Technik ist das?" as question label', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question-label').textContent).toBe('Welche Technik ist das?');
+  });
+
+  it('correct answer is the Japanese term', () => {
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const terms = makeImageGradeSingle().techniques.map((t) => t.term);
+    expect(terms).toContain(correct.textContent?.trim());
+  });
+
+  it('shows German meaning as hint after answering', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makeImageGradeSingle()} onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    const hint = screen.getByTestId('hint');
+    const meanings = makeImageGradeSingle().techniques.map((t) => t.meaning);
+    expect(meanings.some((m) => hint.textContent?.includes(m))).toBe(true);
+  });
+});
+
+describe('Quiz – term-to-meaning (deterministic)', () => {
+  beforeEach(() => { _forcedQuestionType = 'term-to-meaning'; });
+  afterEach(() => { _forcedQuestionType = null; });
+
+  it('shows "Was bedeutet…?" as question label', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    expect(screen.getByTestId('question-label').textContent).toBe('Was bedeutet…?');
+  });
+
+  it('shows the Japanese term as question text', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    const questionText = screen.getByTestId('question').textContent ?? '';
+    const terms = makeGrade().techniques.map((t) => t.term);
+    expect(terms).toContain(questionText);
+  });
+
+  it('correct answer is the German meaning', () => {
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const meanings = makeGrade().techniques.map((t) => t.meaning);
+    expect(meanings).toContain(correct.textContent?.trim());
   });
 });

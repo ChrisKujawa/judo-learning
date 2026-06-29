@@ -155,5 +155,5 @@ Both workflows use Node 20 in GitHub Actions (even though local dev targets Node
 ## Known Gaps / Future Work
 
 - Grades 2 and 1 (Kyu) have fewer exclusive techniques in `techniques.ts` — more entries can be added
-- Pictogram/image quiz mode (show a judo.how image → pick the throw name) is not yet implemented
-- "Nur neue Techniken" toggle (filter to only new techniques for the selected grade) is not yet built
+- Ko-Uchi-Makikomi has no Wikipedia image yet — needs manual lookup
+- Ne-Waza techniques (Osaekomi-Waza, Kansetsu-Waza, Shime-Waza) have no images yet — same approach as throw images can be applied

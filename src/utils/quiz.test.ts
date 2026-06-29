@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shuffle, buildChoices, buildWertChoices, WERTE_DISTRACTORS, scoreEmoji, scoreColor } from '../utils/quiz';
+import { shuffle, assignQuestionType, buildChoices, buildWertChoices, WERTE_DISTRACTORS, scoreEmoji, scoreColor } from '../utils/quiz';
 import type { Technique } from '../data/types';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -63,6 +63,34 @@ describe('shuffle', () => {
   });
 });
 
+// ── assignQuestionType ────────────────────────────────────────────────────────
+
+describe('assignQuestionType', () => {
+  it('returns "judo-wert" for Judo-Werte techniques', () => {
+    const t = makeTechnique({ category: 'Judo-Werte' });
+    expect(assignQuestionType(t)).toBe('judo-wert');
+  });
+
+  it('returns "term-to-meaning" for techniques without imageUrl', () => {
+    const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: undefined });
+    expect(assignQuestionType(t)).toBe('term-to-meaning');
+  });
+
+  it('returns either "image-to-name" or "term-to-meaning" for techniques with imageUrl', () => {
+    const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
+    const results = new Set(Array.from({ length: 50 }, () => assignQuestionType(t)));
+    expect(results.has('image-to-name')).toBe(true);
+    expect(results.has('term-to-meaning')).toBe(true);
+  });
+
+  it('never returns "judo-wert" for non-Werte techniques', () => {
+    const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
+    for (let i = 0; i < 20; i++) {
+      expect(assignQuestionType(t)).not.toBe('judo-wert');
+    }
+  });
+});
+
 // ── buildChoices ──────────────────────────────────────────────────────────────
 
 describe('buildChoices', () => {
@@ -70,48 +98,42 @@ describe('buildChoices', () => {
     const pool = makePool(10);
     const correct = pool[0];
     expect(buildChoices(correct, pool, 'term-to-meaning')).toHaveLength(4);
-    expect(buildChoices(correct, pool, 'meaning-to-term')).toHaveLength(4);
+    expect(buildChoices(correct, pool, 'image-to-name')).toHaveLength(4);
   });
 
-  it('always includes the correct answer in term-to-meaning mode', () => {
+  it('correct answer is meaning for term-to-meaning', () => {
+    const pool = makePool(10);
+    const correct = pool[0];
+    expect(buildChoices(correct, pool, 'term-to-meaning')).toContain(correct.meaning);
+  });
+
+  it('correct answer is term for image-to-name', () => {
+    const pool = makePool(10);
+    const correct = pool[0];
+    expect(buildChoices(correct, pool, 'image-to-name')).toContain(correct.term);
+  });
+
+  it('correct answer appears exactly once (term-to-meaning)', () => {
     const pool = makePool(10);
     const correct = pool[0];
     const choices = buildChoices(correct, pool, 'term-to-meaning');
-    expect(choices).toContain(correct.meaning);
+    expect(choices.filter((c) => c === correct.meaning)).toHaveLength(1);
   });
 
-  it('always includes the correct answer in meaning-to-term mode', () => {
+  it('correct answer appears exactly once (image-to-name)', () => {
     const pool = makePool(10);
     const correct = pool[0];
-    const choices = buildChoices(correct, pool, 'meaning-to-term');
-    expect(choices).toContain(correct.term);
-  });
-
-  it('does not include the correct item as a wrong answer (term-to-meaning)', () => {
-    const pool = makePool(10);
-    const correct = pool[0];
-    const choices = buildChoices(correct, pool, 'term-to-meaning');
-    const occurrences = choices.filter((c) => c === correct.meaning).length;
-    expect(occurrences).toBe(1);
-  });
-
-  it('does not include the correct item as a wrong answer (meaning-to-term)', () => {
-    const pool = makePool(10);
-    const correct = pool[0];
-    const choices = buildChoices(correct, pool, 'meaning-to-term');
-    const occurrences = choices.filter((c) => c === correct.term).length;
-    expect(occurrences).toBe(1);
+    const choices = buildChoices(correct, pool, 'image-to-name');
+    expect(choices.filter((c) => c === correct.term)).toHaveLength(1);
   });
 
   it('all choices are strings', () => {
     const pool = makePool(10);
-    const choices = buildChoices(pool[0], pool, 'term-to-meaning');
-    choices.forEach((c) => expect(typeof c).toBe('string'));
+    buildChoices(pool[0], pool, 'term-to-meaning').forEach((c) => expect(typeof c).toBe('string'));
   });
 
   it('returns fewer wrong answers when pool is small (2 total items)', () => {
     const pool = makePool(2);
-    // Only 1 wrong answer available – should still return without crashing
     const choices = buildChoices(pool[0], pool, 'term-to-meaning');
     expect(choices).toContain(pool[0].meaning);
     expect(choices.length).toBeLessThanOrEqual(4);

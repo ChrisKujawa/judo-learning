@@ -1,4 +1,4 @@
-import type { Technique, QuizMode } from '../data/types';
+import type { Technique, QuestionType } from '../data/types';
 
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -9,15 +9,29 @@ export function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+/**
+ * Assigns a question type to a technique.
+ * - Judo-Werte always get 'judo-wert'
+ * - Techniques with an image randomly get 'image-to-name' or 'term-to-meaning' (50/50)
+ * - Everything else gets 'term-to-meaning'
+ */
+export function assignQuestionType(technique: Technique): QuestionType {
+  if (technique.category === 'Judo-Werte') return 'judo-wert';
+  if (technique.imageUrl) return Math.random() < 0.5 ? 'image-to-name' : 'term-to-meaning';
+  return 'term-to-meaning';
+}
+
 export function buildChoices(
   correct: Technique,
   all: Technique[],
-  mode: QuizMode
+  type: QuestionType
 ): string[] {
-  const correctAnswer = mode === 'term-to-meaning' ? correct.meaning : correct.term;
+  // image-to-name and judo-wert both use the term as the correct answer
+  const useTermAsAnswer = type === 'image-to-name' || type === 'judo-wert';
+  const correctAnswer = useTermAsAnswer ? correct.term : correct.meaning;
   const pool = all
     .filter((t) => t.id !== correct.id)
-    .map((t) => (mode === 'term-to-meaning' ? t.meaning : t.term));
+    .map((t) => (useTermAsAnswer ? t.term : t.meaning));
   const wrong = shuffle(pool).slice(0, 3);
   return shuffle([correctAnswer, ...wrong]);
 }
