@@ -1,50 +1,129 @@
-# React + TypeScript + Vite
+# 🥋 Judo Learning App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Eine mobile-freundliche Web-App zum Lernen von Judo-Techniken und -Theorie für die Kyu-Graduierung — auf Deutsch.
 
-Currently, two official plugins are available:
+**Live:** [chriskujawa.github.io/judo-learning](https://chriskujawa.github.io/judo-learning/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **8 Kyu-Grade** von Weiß-Gelb (8. Kyu) bis Braun (1. Kyu)
+- **Multiple-Choice-Quiz** mit zwei Lernmodi:
+  - 🇯🇵 → 🇩🇪 Japanischer Begriff → Deutsche Bedeutung
+  - 🇩🇪 → 🇯🇵 Deutsche Bedeutung → Japanischer Begriff
+- **Kumulative Technik-Pools** — höhere Grade enthalten alle Techniken der Vorstufen
+- **Sofortiges Feedback** nach jeder Antwort mit Erklärungen
+- **Score-Übersicht** am Ende jeder Runde mit Emoji-Bewertung
+- Mobiloptimiert, funktioniert offline (PWA-ready)
 
-- Configure the top-level `parserOptions` property like this:
+## Technik-Daten
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Inhalte basieren auf dem offiziellen DJB-Graduierungssystem:
+- Grundbegriffe (Dojo, Judogi, Rei, …)
+- Judo-Werte (Jita Kyoei, Seiryoku Zenyo, …)
+- Wurftechniken: Ashi-Waza, Te-Waza, Koshi-Waza, Sutemi-Waza
+- Bodentechniken: Osaekomi-Waza, Kansetsu-Waza, Shime-Waza
+- Grundstellungen, Fallübungen, Kampfbegriffe
+
+---
+
+## Lokale Entwicklung
+
+### Voraussetzungen
+
+- Node.js 18+
+- npm
+
+### Setup
+
+```bash
+git clone https://github.com/ChrisKujawa/judo-learning.git
+cd judo-learning
+npm install
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Die App läuft dann unter `http://localhost:5173/judo-learning/`.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Verfügbare Befehle
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+| Befehl | Beschreibung |
+|--------|-------------|
+| `npm run dev` | Entwicklungsserver starten |
+| `npm run build` | Produktionsbuild erstellen |
+| `npm run preview` | Produktionsbuild lokal vorschauen |
+| `npm test` | Tests einmalig ausführen |
+| `npm run test:watch` | Tests im Watch-Modus |
+| `npm run test:coverage` | Tests mit Coverage-Report |
+| `npm run lint` | ESLint ausführen |
+
+---
+
+## Projektstruktur
+
 ```
+src/
+├── components/
+│   ├── GradeSelector.tsx   # Grad-Auswahl (8. Kyu → 1. Kyu)
+│   ├── ModeSelector.tsx    # Quiz-Modus-Auswahl
+│   └── Quiz.tsx            # Haupt-Quiz-Logik & Score-Screen
+├── data/
+│   ├── types.ts            # Technique, Grade, QuizMode Typen
+│   ├── techniques.ts       # ~55 Techniken mit DJB-Daten
+│   └── grades.ts           # 8 Grad-Objekte mit kumulativen Techniken
+├── utils/
+│   └── quiz.ts             # Reine Hilfsfunktionen (shuffle, buildChoices, …)
+└── test/
+    └── setup.ts            # Vitest + Testing Library Setup
+```
+
+---
+
+## Tests
+
+85 Tests über 6 Dateien mit Vitest + Testing Library:
+
+```bash
+npm test
+```
+
+- `src/utils/quiz.test.ts` — Reine Util-Funktionen
+- `src/data/data.test.ts` — Datenintegrität aller Techniken
+- `src/components/GradeSelector.test.tsx`
+- `src/components/ModeSelector.test.tsx`
+- `src/components/Quiz.test.tsx`
+- `src/App.test.tsx` — Integrationstests
+
+---
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`): Tests auf jedem Push und Pull Request
+- **Deploy** (`.github/workflows/deploy.yml`): Tests → Build → Deploy auf GitHub Pages bei Push auf `main`
+
+---
+
+## Datenmodell
+
+```ts
+interface Technique {
+  id: string;
+  term: string;          // Japanischer Begriff (z.B. "O-Goshi")
+  meaning: string;       // Deutsche Bedeutung (z.B. "Große Hüfte")
+  translation?: string;  // Wort-für-Wort-Übersetzung
+  category: string;      // z.B. "Koshi-Waza"
+  comment?: string;      // Pädagogischer Hinweis
+  link?: string;         // Link zu judo.how
+  introducedAt: number;  // Kyu-Stufe der Einführung (8=Anfänger, 1=Braun)
+}
+```
+
+---
+
+## Quellen
+
+- [judo.how](https://judo.how/) — Technik-Referenzen
+- DJB *Anforderungen für Kyu-Grade 2025*
+- DJB *Kyu-Graduierungssystem Technik-Pools*
+- DJB *Judo-Werte Plakat*
