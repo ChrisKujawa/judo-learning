@@ -11,12 +11,7 @@ interface QuizProps {
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
 export function Quiz({ grade, mode, onBack }: QuizProps) {
-  const questions = useMemo(() => {
-    const pool = mode === 'pictogram'
-      ? grade.techniques.filter((t) => t.imageUrl)
-      : grade.techniques;
-    return shuffle(pool);
-  }, [grade.techniques, mode]);
+  const questions = useMemo(() => shuffle(grade.techniques), [grade.techniques]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>('unanswered');
@@ -25,23 +20,19 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
 
   const current = questions[index];
   const isWert = current.category === 'Judo-Werte';
-  const isPictogram = mode === 'pictogram';
 
   const question = isWert
     ? 'Welcher Begriff ist ein Judo-Wert?'
-    : isPictogram
-    ? 'Welche Technik ist das?'
     : mode === 'term-to-meaning' ? current.term : current.meaning;
 
-  const correctAnswer = (isWert || isPictogram)
+  const correctAnswer = isWert
     ? current.term
     : mode === 'term-to-meaning' ? current.meaning : current.term;
 
   const choices = useMemo(() => {
     if (isWert) return buildWertChoices(current);
-    if (isPictogram) return buildChoices(current, grade.techniques, 'meaning-to-term');
     return buildChoices(current, grade.techniques, mode);
-  }, [current, grade.techniques, mode, isWert, isPictogram]);
+  }, [current, grade.techniques, mode, isWert]);
 
   const hint = isWert ? current.meaning : current.comment;
 
@@ -123,20 +114,19 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
       <div className="flex-1 flex flex-col">
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 text-center">
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">
-            {isWert ? 'Judo-Wert erkennen' : isPictogram ? 'Wurfbild erkennen' : (mode === 'term-to-meaning' ? 'Was bedeutet…?' : 'Wie heißt…?')}
+            {isWert ? 'Judo-Wert erkennen' : (mode === 'term-to-meaning' ? 'Was bedeutet…?' : 'Wie heißt…?')}
           </p>
-          {isPictogram && current.imageUrl ? (
+          {current.imageUrl && (
             <img
               src={current.imageUrl}
-              alt="Judo throw illustration"
-              className="mx-auto mb-4 max-h-48 object-contain rounded-xl"
-              data-testid="pictogram-image"
+              alt={`${current.term} Illustration`}
+              className="mx-auto mb-4 max-h-44 object-contain rounded-xl"
+              data-testid="technique-image"
             />
-          ) : (
-            <h2 className="text-2xl font-bold text-gray-800 leading-snug" data-testid="question">
-              {question}
-            </h2>
           )}
+          <h2 className="text-2xl font-bold text-gray-800 leading-snug" data-testid="question">
+            {question}
+          </h2>
           {current.category && (
             <span className="mt-3 inline-block text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
               {current.category}

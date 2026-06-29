@@ -1,4 +1,4 @@
-export type QuizMode = 'term-to-meaning' | 'meaning-to-term' | 'pictogram';
+export type QuizMode = 'term-to-meaning' | 'meaning-to-term';
 
 export interface Technique {
   id: string;

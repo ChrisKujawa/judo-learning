@@ -7,8 +7,6 @@ interface ModeSelectorProps {
 }
 
 export function ModeSelector({ grade, onSelectMode, onBack }: ModeSelectorProps) {
-  const hasPictograms = grade.techniques.some((t) => t.imageUrl);
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
@@ -48,20 +46,6 @@ export function ModeSelector({ grade, onSelectMode, onBack }: ModeSelectorProps)
               Deutsche Bedeutung angezeigt — wähle den richtigen Begriff
             </div>
           </button>
-
-          {hasPictograms && (
-            <button
-              onClick={() => onSelectMode('pictogram')}
-              className="bg-white border-2 border-gray-200 rounded-2xl p-5 text-left shadow-sm active:bg-gray-50 transition"
-              data-testid="mode-btn-pictogram"
-            >
-              <div className="text-2xl mb-2">🖼️ → 🇯🇵</div>
-              <div className="font-semibold text-gray-800">Bildquiz</div>
-              <div className="text-sm text-gray-500 mt-1">
-                Wurfbild angezeigt — erkenne die Technik
-              </div>
-            </button>
-          )}
         </div>
       </div>
     </div>

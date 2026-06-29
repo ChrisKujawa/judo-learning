@@ -312,9 +312,9 @@ describe('Quiz – Judo-Werte special mode', () => {
   });
 });
 
-// ── Pictogram quiz mode ───────────────────────────────────────────────────────
+// ── Technique image display ───────────────────────────────────────────────────
 
-function makePictogramGrade(): Grade {
+function makeGradeWithImages(): Grade {
   const techniques: Technique[] = [
     { id: 'o-goshi', term: 'O-Goshi', meaning: 'Große Hüfte', category: 'Koshi-Waza', introducedAt: 7, imageUrl: 'https://example.com/o-goshi.jpg' },
     { id: 'uchi-mata', term: 'Uchi-Mata', meaning: 'Innerer Schenkelwurf', category: 'Ashi-Waza', introducedAt: 5, imageUrl: 'https://example.com/uchi-mata.jpg' },
@@ -324,34 +324,26 @@ function makePictogramGrade(): Grade {
   return { id: 'kyu7', kyu: 7, name: '7. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques };
 }
 
-describe('Quiz – pictogram mode', () => {
-  it('shows the technique image instead of text question', () => {
-    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
-    expect(screen.getByTestId('pictogram-image')).toBeInTheDocument();
+describe('Quiz – technique images', () => {
+  it('shows technique image when imageUrl is present', () => {
+    render(<Quiz grade={makeGradeWithImages()} mode="term-to-meaning" onBack={vi.fn()} />);
+    expect(screen.getByTestId('technique-image')).toBeInTheDocument();
   });
 
-  it('shows "Wurfbild erkennen" label', () => {
-    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
-    expect(screen.getByText('Wurfbild erkennen')).toBeInTheDocument();
+  it('shows image AND text question together', () => {
+    render(<Quiz grade={makeGradeWithImages()} mode="term-to-meaning" onBack={vi.fn()} />);
+    expect(screen.getByTestId('technique-image')).toBeInTheDocument();
+    expect(screen.getByTestId('question')).toBeInTheDocument();
   });
 
-  it('correct answer is the Japanese technique term', () => {
-    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
-    const correct = screen.getAllByTestId('choice-correct')[0];
-    const terms = ['O-Goshi', 'Uchi-Mata', 'Tai-Otoshi', 'Harai-Goshi'];
-    expect(terms).toContain(correct.textContent?.trim());
+  it('does not show image when technique has no imageUrl', () => {
+    render(<Quiz grade={makeGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    expect(screen.queryByTestId('technique-image')).not.toBeInTheDocument();
   });
 
-  it('shows exactly 4 answer choices', () => {
-    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
-    const choicesContainer = screen.getByTestId('choices');
-    expect(within(choicesContainer).getAllByRole('button')).toHaveLength(4);
-  });
-
-  it('increments score when correct answer is selected', async () => {
-    const user = userEvent.setup();
-    render(<Quiz grade={makePictogramGrade()} mode="pictogram" onBack={vi.fn()} />);
-    await user.click(screen.getAllByTestId('choice-correct')[0]);
-    expect(screen.getByTestId('score').textContent).toContain('1');
+  it('image has meaningful alt text', () => {
+    render(<Quiz grade={makeGradeWithImages()} mode="term-to-meaning" onBack={vi.fn()} />);
+    const img = screen.getByTestId('technique-image');
+    expect(img.getAttribute('alt')).toMatch(/Illustration/);
   });
 });
