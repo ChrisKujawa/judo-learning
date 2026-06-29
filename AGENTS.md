@@ -98,6 +98,8 @@ npm run test:watch    # Watch mode
 npm run test:coverage # Coverage report
 ```
 
+> **Rule:** Every new feature and every bug fix must include tests. No PR should be merged without corresponding test coverage for the changed behaviour.
+
 All components use `data-testid` attributes for reliable test targeting:
 - `data-testid="grade-btn-{id}"` — grade buttons in GradeSelector
 - `data-testid="mode-btn-{mode}"` — mode buttons in ModeSelector
