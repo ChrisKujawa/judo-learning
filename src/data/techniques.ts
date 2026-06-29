@@ -532,6 +532,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ma-Sutemi-Waza',
     comment: 'Ma-Sutemi-Waza. Pflicht bei 1. Kyu. Tori greift Uke von hinten und wirft rückwärts.',
     link: 'https://judo.how/nage-waza/sutemi-waza/ma-sutemi-waza/ura-nage/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/40/Ura-nage_%28cropped%29.jpg',
     introducedAt: 1,
   },
   {
@@ -542,6 +543,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Yoko-Sutemi-Waza',
     comment: 'Yoko-Sutemi-Waza. Pflicht bei 3. Kyu. Konter gegen O-Goshi.',
     link: 'https://judo.how/nage-waza/sutemi-waza/yoko-sutemi-waza/tani-otoshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Tani-otoshi.jpg',
     introducedAt: 3,
   },
   {
@@ -552,6 +554,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Yoko-Sutemi-Waza',
     comment: 'Yoko-Sutemi-Waza. Pflicht bei 2. Kyu. Arm einklemmen und gemeinsam rollen.',
     link: 'https://judo.how/nage-waza/sutemi-waza/yoko-sutemi-waza/soto-makikomi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Soto-makikomi.jpg',
     introducedAt: 2,
   },
   {
@@ -572,6 +575,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Te-Waza',
     comment: 'Erweiterungsprogramm. Uke wird über die Schulter gerollt – klassisches "Feuerwehrgriff"-Prinzip.',
     link: 'https://judo.how/nage-waza/tachi-waza/te-waza/kata-guruma/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Kata_guruma_Fiesta_de_la_cultura_japonesa.jpg',
     introducedAt: 3,
   },
   {
@@ -582,6 +586,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Te-Waza',
     comment: 'Erweiterungsprogramm. Zeigt das Kuzushi-Prinzip: minimale Kraft, maximale Wirkung.',
     link: 'https://judo.how/nage-waza/tachi-waza/te-waza/uki-otoshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Uki-otoshi_Throw.jpg',
     introducedAt: 3,
   },
   {
@@ -592,6 +597,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Erweiterungsprogramm. Tori greift Ukes Gürtel am Rücken.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/tsuri-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Tsuri-goshi.jpg',
     introducedAt: 3,
   },
   {
@@ -602,6 +608,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Koshi-Waza',
     comment: 'Erweiterungsprogramm. Kontertechnik gegen Hüftwürfe.',
     link: 'https://judo.how/nage-waza/tachi-waza/koshi-waza/utsuri-goshi/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Utsuri-goshi.jpg',
     introducedAt: 3,
   },
   {
@@ -612,6 +619,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Erweiterungsprogramm. Das gestreckte Bein sperrt Ukes Beine – Uke dreht sich darüber.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/ashi-guruma/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Ashi-guruma_%28crop%29.jpg',
     introducedAt: 3,
   },
   {
@@ -622,6 +630,7 @@ export const ALL_TECHNIQUES: Technique[] = [
     category: 'Ashi-Waza',
     comment: 'Erweiterungsprogramm. Beide Füße von Uke werden gleichzeitig gefegt.',
     link: 'https://judo.how/nage-waza/tachi-waza/ashi-waza/okuri-ashi-harai/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Okuri-ashi-barai.jpg',
     introducedAt: 3,
   },
 
