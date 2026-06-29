@@ -1,40 +1,59 @@
 import { useState, useMemo } from 'react';
-import type { Grade, QuizMode } from '../data/types';
-import { shuffle, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
+import type { Grade, QuestionType } from '../data/types';
+import { shuffle, assignQuestionType, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
 
 interface QuizProps {
   grade: Grade;
-  mode: QuizMode;
   onBack: () => void;
+}
+
+interface Question {
+  technique: (typeof grade.techniques)[number];
+  type: QuestionType;
 }
 
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
-export function Quiz({ grade, mode, onBack }: QuizProps) {
-  const questions = useMemo(() => shuffle(grade.techniques), [grade.techniques]);
+export function Quiz({ grade, onBack }: QuizProps) {
+  const questions: Question[] = useMemo(
+    () => shuffle(grade.techniques).map((t) => ({ technique: t, type: assignQuestionType(t) })),
+    [grade.techniques]
+  );
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>('unanswered');
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  const current = questions[index];
-  const isWert = current.category === 'Judo-Werte';
+  const { technique: current, type: questionType } = questions[index];
 
-  const question = isWert
-    ? 'Welcher Begriff ist ein Judo-Wert?'
-    : mode === 'term-to-meaning' ? current.term : current.meaning;
+  const question =
+    questionType === 'judo-wert' ? 'Welcher Begriff ist ein Judo-Wert?' :
+    questionType === 'image-to-name' ? 'Welche Technik ist das?' :
+    current.term;
 
-  const correctAnswer = isWert
-    ? current.term
-    : mode === 'term-to-meaning' ? current.meaning : current.term;
+  const correctAnswer =
+    questionType === 'term-to-meaning' ? current.meaning : current.term;
 
   const choices = useMemo(() => {
-    if (isWert) return buildWertChoices(current);
-    return buildChoices(current, grade.techniques, mode);
-  }, [current, grade.techniques, mode, isWert]);
+    if (questionType === 'judo-wert') return buildWertChoices(current);
+    return buildChoices(current, grade.techniques, questionType);
+  }, [current, grade.techniques, questionType]);
 
-  const hint = isWert ? current.meaning : current.comment;
+  // After answering: for image-to-name show the German meaning; otherwise show the comment
+  const hint =
+    questionType === 'judo-wert' ? current.meaning :
+    questionType === 'image-to-name' ? current.meaning :
+    current.comment;
+
+  // Show image before answering only for image-to-name; after answering for term-to-meaning
+  const showImageBefore = questionType === 'image-to-name' && !!current.imageUrl;
+  const showImageAfter  = questionType === 'term-to-meaning' && !!current.imageUrl && answerState !== 'unanswered';
+
+  const label =
+    questionType === 'judo-wert' ? 'Judo-Wert erkennen' :
+    questionType === 'image-to-name' ? 'Welche Technik ist das?' :
+    'Was bedeutet…?';
 
   function handleSelect(choice: string) {
     if (answerState !== 'unanswered') return;
@@ -113,15 +132,15 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
 
       <div className="flex-1 flex flex-col">
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 text-center">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">
-            {isWert ? 'Judo-Wert erkennen' : (mode === 'term-to-meaning' ? 'Was bedeutet…?' : 'Wie heißt…?')}
+          <p className="text-xs uppercase tracking-widest text-gray-400 mb-3" data-testid="question-label">
+            {label}
           </p>
-          {current.imageUrl && (
+          {showImageBefore && (
             <img
               src={current.imageUrl}
               alt={`${current.term} Illustration`}
               className="mx-auto mb-4 max-h-44 object-contain rounded-xl"
-              data-testid="technique-image"
+              data-testid="technique-image-before"
             />
           )}
           <h2 className="text-2xl font-bold text-gray-800 leading-snug" data-testid="question">
@@ -171,6 +190,14 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
 
         {answerState !== 'unanswered' && (
           <div className="mt-4">
+            {showImageAfter && (
+              <img
+                src={current.imageUrl}
+                alt={`${current.term} Illustration`}
+                className="mx-auto mb-3 max-h-44 object-contain rounded-xl"
+                data-testid="technique-image-after"
+              />
+            )}
             {hint && (
               <div
                 className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3 text-sm text-blue-800"
