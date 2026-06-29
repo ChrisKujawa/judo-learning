@@ -22,6 +22,26 @@ export function buildChoices(
   return shuffle([correctAnswer, ...wrong]);
 }
 
+/** Distractor pool for Judo-Werte questions — plausible character traits that are NOT official Judo-Werte. */
+export const WERTE_DISTRACTORS = [
+  'Ausdauer', 'Neugier', 'Ehrgeiz', 'Geduld', 'Empathie',
+  'Kreativität', 'Zuverlässigkeit', 'Optimismus', 'Fleiß', 'Toleranz',
+  'Offenheit', 'Begeisterung', 'Verantwortung', 'Disziplin', 'Loyalität',
+  'Mitgefühl', 'Entschlossenheit', 'Spontaneität', 'Gelassenheit',
+  'Durchhaltevermögen', 'Vertrauen', 'Beharrlichkeit', 'Integrität',
+  'Aufmerksamkeit', 'Einfühlungsvermögen',
+];
+
+/**
+ * Builds choices for a Judo-Werte question.
+ * Correct answer is the value's term; wrong answers are random distractors
+ * from WERTE_DISTRACTORS (not other technique names).
+ */
+export function buildWertChoices(correct: Technique): string[] {
+  const wrong = shuffle(WERTE_DISTRACTORS).slice(0, 3);
+  return shuffle([correct.term, ...wrong]);
+}
+
 export function scoreEmoji(pct: number): string {
   if (pct >= 80) return '🏆';
   if (pct >= 50) return '👍';

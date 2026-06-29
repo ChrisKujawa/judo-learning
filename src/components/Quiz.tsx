@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Grade, QuizMode } from '../data/types';
-import { shuffle, buildChoices, scoreEmoji, scoreColor } from '../utils/quiz';
+import { shuffle, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
 
 interface QuizProps {
   grade: Grade;
@@ -19,12 +19,16 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
   const [finished, setFinished] = useState(false);
 
   const current = questions[index];
-  const question = mode === 'term-to-meaning' ? current.term : current.meaning;
-  const correctAnswer = mode === 'term-to-meaning' ? current.meaning : current.term;
+  const isWert = current.category === 'Judo-Werte';
+  const question = isWert
+    ? 'Welcher Begriff ist ein Judo-Wert?'
+    : mode === 'term-to-meaning' ? current.term : current.meaning;
+  const correctAnswer = isWert ? current.term : (mode === 'term-to-meaning' ? current.meaning : current.term);
   const choices = useMemo(
-    () => buildChoices(current, grade.techniques, mode),
-    [current, grade.techniques, mode]
+    () => isWert ? buildWertChoices(current) : buildChoices(current, grade.techniques, mode),
+    [current, grade.techniques, mode, isWert]
   );
+  const hint = isWert ? current.meaning : current.comment;
 
   function handleSelect(choice: string) {
     if (answerState !== 'unanswered') return;
@@ -104,7 +108,7 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
       <div className="flex-1 flex flex-col">
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 text-center">
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">
-            {mode === 'term-to-meaning' ? 'Was bedeutet…?' : 'Wie heißt…?'}
+            {isWert ? 'Judo-Wert erkennen' : (mode === 'term-to-meaning' ? 'Was bedeutet…?' : 'Wie heißt…?')}
           </p>
           <h2 className="text-2xl font-bold text-gray-800 leading-snug" data-testid="question">
             {question}
@@ -153,12 +157,12 @@ export function Quiz({ grade, mode, onBack }: QuizProps) {
 
         {answerState !== 'unanswered' && (
           <div className="mt-4">
-            {current.comment && (
+            {hint && (
               <div
                 className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3 text-sm text-blue-800"
                 data-testid="hint"
               >
-                💡 {current.comment}
+                💡 {hint}
               </div>
             )}
             {current.link && (

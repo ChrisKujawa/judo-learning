@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shuffle, buildChoices, scoreEmoji, scoreColor } from '../utils/quiz';
+import { shuffle, buildChoices, buildWertChoices, WERTE_DISTRACTORS, scoreEmoji, scoreColor } from '../utils/quiz';
 import type { Technique } from '../data/types';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -115,6 +115,49 @@ describe('buildChoices', () => {
     const choices = buildChoices(pool[0], pool, 'term-to-meaning');
     expect(choices).toContain(pool[0].meaning);
     expect(choices.length).toBeLessThanOrEqual(4);
+  });
+});
+
+// ── buildWertChoices ──────────────────────────────────────────────────────────
+
+describe('buildWertChoices', () => {
+  const wert = makeTechnique({
+    id: 'wert-respekt',
+    term: 'Respekt',
+    meaning: 'Begegne allen Menschen mit Achtung',
+    category: 'Judo-Werte',
+  });
+
+  it('returns exactly 4 choices', () => {
+    expect(buildWertChoices(wert)).toHaveLength(4);
+  });
+
+  it('includes the correct term', () => {
+    expect(buildWertChoices(wert)).toContain('Respekt');
+  });
+
+  it('correct term appears exactly once', () => {
+    const choices = buildWertChoices(wert);
+    expect(choices.filter((c) => c === 'Respekt')).toHaveLength(1);
+  });
+
+  it('all choices are strings', () => {
+    buildWertChoices(wert).forEach((c) => expect(typeof c).toBe('string'));
+  });
+
+  it('wrong choices come from WERTE_DISTRACTORS', () => {
+    const choices = buildWertChoices(wert).filter((c) => c !== 'Respekt');
+    choices.forEach((c) => expect(WERTE_DISTRACTORS).toContain(c));
+  });
+
+  it('has no duplicate choices', () => {
+    const choices = buildWertChoices(wert);
+    expect(new Set(choices).size).toBe(choices.length);
+  });
+
+  it('does not include the meaning as a choice', () => {
+    const choices = buildWertChoices(wert);
+    expect(choices).not.toContain(wert.meaning);
   });
 });
 

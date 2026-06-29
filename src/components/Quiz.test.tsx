@@ -268,3 +268,46 @@ describe('Quiz – score screen', () => {
     expect(onBack).toHaveBeenCalledOnce();
   });
 });
+
+// ── Judo-Werte special mode ───────────────────────────────────────────────────
+
+function makeWertGrade(): Grade {
+  const werte: Technique[] = [
+    { id: 'wert-respekt', term: 'Respekt', meaning: 'Begegne allen Menschen mit Achtung', category: 'Judo-Werte', introducedAt: 8 },
+    { id: 'wert-mut', term: 'Mut', meaning: 'Gib niemals auf', category: 'Judo-Werte', introducedAt: 8 },
+    { id: 'wert-ehrlichkeit', term: 'Ehrlichkeit', meaning: 'Kämpfe fair', category: 'Judo-Werte', introducedAt: 8 },
+    { id: 'wert-hoeflichkeit', term: 'Höflichkeit', meaning: 'Behandle andere mit Wertschätzung', category: 'Judo-Werte', introducedAt: 8 },
+  ];
+  return { id: 'wert-grade', kyu: 8, name: '8. Kyu', subtitle: 'Test', bgColor: '', textColor: '', techniques: werte };
+}
+
+describe('Quiz – Judo-Werte special mode', () => {
+  it('shows fixed question text regardless of mode', () => {
+    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    expect(screen.getByTestId('question').textContent).toBe('Welcher Begriff ist ein Judo-Wert?');
+  });
+
+  it('shows fixed question text in meaning-to-term mode too', () => {
+    render(<Quiz grade={makeWertGrade()} mode="meaning-to-term" onBack={vi.fn()} />);
+    expect(screen.getByTestId('question').textContent).toBe('Welcher Begriff ist ein Judo-Wert?');
+  });
+
+  it('shows "Judo-Wert erkennen" label', () => {
+    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    expect(screen.getByText('Judo-Wert erkennen')).toBeInTheDocument();
+  });
+
+  it('correct answer button shows the value term', () => {
+    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    const correct = screen.getAllByTestId('choice-correct')[0];
+    const werte = ['Respekt', 'Mut', 'Ehrlichkeit', 'Höflichkeit'];
+    expect(werte).toContain(correct.textContent?.trim());
+  });
+
+  it('shows meaning as hint after answering', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makeWertGrade()} mode="term-to-meaning" onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    expect(screen.getByTestId('hint')).toBeInTheDocument();
+  });
+});
