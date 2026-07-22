@@ -1,61 +1,7 @@
-import { useEffect, useState } from 'react';
+import type { InstallPromptControls } from '../hooks/useInstallPrompt';
 
-interface BeforeInstallPromptChoice {
-  outcome: 'accepted' | 'dismissed';
-  platform: string;
-}
-
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<BeforeInstallPromptChoice>;
-  prompt(): Promise<void>;
-}
-
-type StandaloneNavigator = Navigator & {
-  standalone?: boolean;
-};
-
-function isStandalone() {
-  return (
-    Boolean(window.matchMedia?.('(display-mode: standalone)')?.matches) ||
-    Boolean((window.navigator as StandaloneNavigator).standalone)
-  );
-}
-
-export function InstallPrompt() {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(() => isStandalone());
-
-  useEffect(() => {
-    function handleBeforeInstallPrompt(event: Event) {
-      event.preventDefault();
-      setInstallPrompt(event as BeforeInstallPromptEvent);
-    }
-
-    function handleAppInstalled() {
-      setInstalled(true);
-      setInstallPrompt(null);
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-  }, []);
-
-  if (installed || !installPrompt) return null;
-
-  async function handleInstallClick() {
-    const promptEvent = installPrompt;
-    if (!promptEvent) return;
-
-    setInstallPrompt(null);
-    await promptEvent.prompt();
-    await promptEvent.userChoice;
-  }
+export function InstallPrompt({ canInstall, onInstall }: InstallPromptControls) {
+  if (!canInstall) return null;
 
   return (
     <section
@@ -68,7 +14,7 @@ export function InstallPrompt() {
       </p>
       <button
         type="button"
-        onClick={handleInstallClick}
+        onClick={() => void onInstall()}
         className="w-full bg-green-600 text-white font-semibold py-3 rounded-xl active:scale-95 transition-transform"
         data-testid="install-btn"
       >

@@ -1,15 +1,23 @@
 import type { Grade } from '../data/types';
 import { calculateAccuracy, type ProgressStats } from '../utils/progress';
+import type { InstallPromptControls } from '../hooks/useInstallPrompt';
 import { InstallPrompt } from './InstallPrompt';
 
 interface GradeSelectorProps {
   grades: Grade[];
   progress?: ProgressStats;
+  installPrompt?: InstallPromptControls;
   onSelect: (grade: Grade) => void;
   onResetProgress?: () => void;
 }
 
-export function GradeSelector({ grades, progress, onSelect, onResetProgress }: GradeSelectorProps) {
+export function GradeSelector({
+  grades,
+  progress,
+  installPrompt,
+  onSelect,
+  onResetProgress,
+}: GradeSelectorProps) {
   const hasProgress = progress
     ? progress.totalQuizzesCompleted > 0 || progress.latestSelectedGradeId !== null
     : false;
@@ -27,7 +35,7 @@ export function GradeSelector({ grades, progress, onSelect, onResetProgress }: G
         <p className="text-gray-500">Wähle deinen Gürtelgrad zum Üben</p>
       </div>
 
-      <InstallPrompt />
+      {installPrompt && <InstallPrompt {...installPrompt} />}
 
       {progress && (
         <section

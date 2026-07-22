@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { InstallPrompt } from './InstallPrompt';
 
 async function dispatchBeforeInstallPrompt() {
@@ -18,6 +19,11 @@ async function dispatchBeforeInstallPrompt() {
   return event;
 }
 
+function InstallPromptHarness() {
+  const installPrompt = useInstallPrompt();
+  return <InstallPrompt {...installPrompt} />;
+}
+
 describe('InstallPrompt', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -25,7 +31,7 @@ describe('InstallPrompt', () => {
   });
 
   it('stays hidden until the browser exposes an install prompt', () => {
-    render(<InstallPrompt />);
+    render(<InstallPrompt canInstall={false} onInstall={vi.fn()} />);
 
     expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
   });
@@ -33,13 +39,13 @@ describe('InstallPrompt', () => {
   it('renders safely when matchMedia is unavailable', () => {
     vi.stubGlobal('matchMedia', undefined);
 
-    render(<InstallPrompt />);
+    render(<InstallPromptHarness />);
 
     expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
   });
 
   it('shows German install UI after beforeinstallprompt', async () => {
-    render(<InstallPrompt />);
+    render(<InstallPromptHarness />);
 
     await dispatchBeforeInstallPrompt();
 
@@ -50,7 +56,7 @@ describe('InstallPrompt', () => {
 
   it('starts the deferred browser prompt when the install button is clicked', async () => {
     const user = userEvent.setup();
-    render(<InstallPrompt />);
+    render(<InstallPromptHarness />);
     const installEvent = await dispatchBeforeInstallPrompt();
 
     await user.click(screen.getByTestId('install-btn'));
