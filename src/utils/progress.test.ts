@@ -94,6 +94,57 @@ describe('progress storage helpers', () => {
     expect(normalized.techniques.invalid).toBeUndefined();
   });
 
+  it('ignores unsafe storage keys while normalizing nested stats', () => {
+    const normalized = normalizeProgress({
+      grades: {
+        __proto__: {
+          quizzesCompleted: 9,
+          totalAnswers: 9,
+          totalCorrectAnswers: 9,
+          bestScorePercentage: 100,
+        },
+        constructor: {
+          quizzesCompleted: 9,
+          totalAnswers: 9,
+          totalCorrectAnswers: 9,
+          bestScorePercentage: 100,
+        },
+        prototype: {
+          quizzesCompleted: 9,
+          totalAnswers: 9,
+          totalCorrectAnswers: 9,
+          bestScorePercentage: 100,
+        },
+        kyu7: {
+          quizzesCompleted: 1,
+          totalAnswers: 3,
+          totalCorrectAnswers: 2,
+          bestScorePercentage: 67,
+        },
+      },
+      techniques: {
+        __proto__: { correctAnswers: 9, wrongAnswers: 9 },
+        constructor: { correctAnswers: 9, wrongAnswers: 9 },
+        prototype: { correctAnswers: 9, wrongAnswers: 9 },
+        'o-goshi': { correctAnswers: 1, wrongAnswers: 0 },
+      },
+    });
+
+    expect(normalized.grades.kyu7).toEqual({
+      quizzesCompleted: 1,
+      totalAnswers: 3,
+      totalCorrectAnswers: 2,
+      bestScorePercentage: 67,
+    });
+    expect(Object.prototype.hasOwnProperty.call(normalized.grades, '__proto__')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(normalized.grades, 'constructor')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(normalized.grades, 'prototype')).toBe(false);
+    expect(normalized.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
+    expect(Object.prototype.hasOwnProperty.call(normalized.techniques, '__proto__')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(normalized.techniques, 'constructor')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(normalized.techniques, 'prototype')).toBe(false);
+  });
+
   it('falls back to empty progress when stored JSON is corrupt', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     localStorage.setItem(PROGRESS_STORAGE_KEY, '{broken');
@@ -106,6 +157,27 @@ describe('progress storage helpers', () => {
     localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ totalQuizzesCompleted: 1 }));
 
     expect(loadProgress().totalQuizzesCompleted).toBe(1);
+  });
+
+  it('falls back safely when default localStorage access is blocked during load', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const originalWindow = globalThis.window;
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        get localStorage() {
+          throw new Error('storage blocked');
+        },
+      },
+    });
+
+    expect(loadProgress()).toEqual(createEmptyProgress());
+    expect(warn).toHaveBeenCalled();
+
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: originalWindow,
+    });
   });
 
   it('saves normalized progress to localStorage', () => {
@@ -121,6 +193,28 @@ describe('progress storage helpers', () => {
       version: 1,
       totalQuizzesCompleted: 1,
       bestScorePercentage: 99,
+    });
+  });
+
+  it('does not throw when default localStorage access is blocked during save or reset', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const originalWindow = globalThis.window;
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        get localStorage() {
+          throw new Error('storage blocked');
+        },
+      },
+    });
+
+    expect(() => saveProgress(createEmptyProgress())).not.toThrow();
+    expect(() => resetProgress()).not.toThrow();
+    expect(warn).toHaveBeenCalledTimes(2);
+
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: originalWindow,
     });
   });
 

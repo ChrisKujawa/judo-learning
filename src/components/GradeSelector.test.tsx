@@ -131,4 +131,10 @@ describe('GradeSelector', () => {
 
     expect(onResetProgress).toHaveBeenCalledOnce();
   });
+
+  it('disables reset when no reset handler is provided', () => {
+    render(<GradeSelector grades={[makeGrade()]} progress={makeProgress()} onSelect={vi.fn()} />);
+
+    expect(screen.getByTestId('reset-progress-btn')).toBeDisabled();
+  });
 });

@@ -12,6 +12,7 @@ export function GradeSelector({ grades, progress, onSelect, onResetProgress }: G
   const hasProgress = progress
     ? progress.totalQuizzesCompleted > 0 || progress.latestSelectedGradeId !== null
     : false;
+  const canResetProgress = hasProgress && !!onResetProgress;
   const latestGrade = grades.find((grade) => grade.id === progress?.latestSelectedGradeId);
   const totalAccuracy = progress
     ? calculateAccuracy(progress.totalCorrectAnswers, progress.totalAnswers)
@@ -38,7 +39,7 @@ export function GradeSelector({ grades, progress, onSelect, onResetProgress }: G
             <button
               type="button"
               onClick={onResetProgress}
-              disabled={!hasProgress}
+              disabled={!canResetProgress}
               className="text-xs font-semibold text-red-600 disabled:text-gray-300 disabled:cursor-not-allowed"
               data-testid="reset-progress-btn"
             >

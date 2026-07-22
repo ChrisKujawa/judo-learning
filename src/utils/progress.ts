@@ -80,9 +80,10 @@ export function normalizeProgress(raw: unknown): ProgressStats {
   };
 }
 
-export function loadProgress(storage: Storage = window.localStorage): ProgressStats {
+export function loadProgress(storage?: Storage): ProgressStats {
   try {
-    const stored = storage.getItem(PROGRESS_STORAGE_KEY);
+    const targetStorage = storage ?? window.localStorage;
+    const stored = targetStorage.getItem(PROGRESS_STORAGE_KEY);
     return stored ? normalizeProgress(JSON.parse(stored)) : createEmptyProgress();
   } catch (error) {
     console.warn('Lernfortschritt konnte nicht geladen werden.', error);
@@ -90,17 +91,19 @@ export function loadProgress(storage: Storage = window.localStorage): ProgressSt
   }
 }
 
-export function saveProgress(progress: ProgressStats, storage: Storage = window.localStorage) {
+export function saveProgress(progress: ProgressStats, storage?: Storage) {
   try {
-    storage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(normalizeProgress(progress)));
+    const targetStorage = storage ?? window.localStorage;
+    targetStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(normalizeProgress(progress)));
   } catch (error) {
     console.warn('Lernfortschritt konnte nicht gespeichert werden.', error);
   }
 }
 
-export function resetProgress(storage: Storage = window.localStorage): ProgressStats {
+export function resetProgress(storage?: Storage): ProgressStats {
   try {
-    storage.removeItem(PROGRESS_STORAGE_KEY);
+    const targetStorage = storage ?? window.localStorage;
+    targetStorage.removeItem(PROGRESS_STORAGE_KEY);
   } catch (error) {
     console.warn('Lernfortschritt konnte nicht zurückgesetzt werden.', error);
   }
@@ -188,7 +191,7 @@ function normalizeGradeProgress(raw: unknown): Record<string, GradeProgress> {
   if (!isRecord(raw)) return {};
 
   return Object.entries(raw).reduce<Record<string, GradeProgress>>((normalized, [gradeId, value]) => {
-    if (!gradeId || !isRecord(value)) return normalized;
+    if (!isSafeStorageKey(gradeId) || !isRecord(value)) return normalized;
 
     normalized[gradeId] = {
       quizzesCompleted: normalizeCount(value.quizzesCompleted),
@@ -204,7 +207,7 @@ function normalizeTechniqueProgress(raw: unknown): Record<string, TechniqueProgr
   if (!isRecord(raw)) return {};
 
   return Object.entries(raw).reduce<Record<string, TechniqueProgress>>((normalized, [techniqueId, value]) => {
-    if (!techniqueId || !isRecord(value)) return normalized;
+    if (!isSafeStorageKey(techniqueId) || !isRecord(value)) return normalized;
 
     normalized[techniqueId] = {
       correctAnswers: normalizeCount(value.correctAnswers),
@@ -253,4 +256,8 @@ function normalizeOptionalString(value: unknown): string | null {
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isSafeStorageKey(key: string): boolean {
+  return key !== '' && key !== '__proto__' && key !== 'constructor' && key !== 'prototype';
 }
