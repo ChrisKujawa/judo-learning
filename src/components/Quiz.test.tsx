@@ -3,6 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Quiz } from '../components/Quiz';
 import type { Grade, Technique, QuestionType } from '../data/types';
+import { createEmptyProgress, type ProgressStats } from '../utils/progress';
 
 // Module-level closure variable to pin assignQuestionType in deterministic tests.
 // null = use real implementation (default for all other tests)
@@ -44,6 +45,17 @@ function makeGrade(techniqueCount = 8, overrides: Partial<Technique> = {}): Grad
   return {
     id: 'kyu7', kyu: 7, name: '7. Kyu – Gelb', subtitle: 'Test',
     bgColor: 'bg-yellow-400', textColor: 'text-yellow-900', techniques,
+  };
+}
+
+function makeProgress(overrides: Partial<ProgressStats> = {}): ProgressStats {
+  return {
+    ...createEmptyProgress(),
+    totalQuizzesCompleted: 3,
+    totalAnswers: 10,
+    totalCorrectAnswers: 8,
+    bestScorePercentage: 100,
+    ...overrides,
   };
 }
 
@@ -204,6 +216,40 @@ describe('Quiz – score screen', () => {
     await answerAllCorrectly(user, 2);
     await user.click(screen.getByText('Nochmal üben'));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it('calls onComplete with quiz summary and per-technique answer results', async () => {
+    const user = userEvent.setup();
+    const onComplete = vi.fn();
+    const grade = makeGrade(2);
+    render(<Quiz grade={grade} onBack={vi.fn()} onComplete={onComplete} />);
+
+    await answerAllCorrectly(user, grade.techniques.length);
+
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(onComplete.mock.calls[0][0]).toMatchObject({
+      gradeId: 'kyu7',
+      gradeName: '7. Kyu – Gelb',
+      score: 2,
+      totalQuestions: 2,
+      answers: [
+        { correct: true },
+        { correct: true },
+      ],
+    });
+  });
+
+  it('shows German learning stats on the score screen when progress is available', async () => {
+    const user = userEvent.setup();
+    render(<Quiz grade={makeGrade(2)} progress={makeProgress()} onBack={vi.fn()} />);
+
+    await answerAllCorrectly(user, 2);
+
+    expect(screen.getByTestId('score-stats-summary')).toHaveTextContent('Dein Lernstand');
+    expect(screen.getByTestId('score-stats-summary')).toHaveTextContent(
+      'Insgesamt 3 Quiz abgeschlossen, 80% richtig.'
+    );
+    expect(screen.getByTestId('score-stats-summary')).toHaveTextContent('Bestwert: 100%');
   });
 });
 
