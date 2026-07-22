@@ -102,6 +102,10 @@ npm test
 - **CI** (`.github/workflows/ci.yml`): Tests auf jedem Push und Pull Request
 - **Deploy** (`.github/workflows/deploy.yml`): Tests → Build → Deploy auf GitHub Pages bei Push auf `main`
 
+### Abhängigkeits-Updates
+
+Renovate verwaltet npm- und GitHub-Actions-Updates über `renovate.json`. Geeignete Dependency- und Lockfile-PRs aktivieren GitHub Auto-Merge, der Merge erfolgt erst nach erfolgreichen Pflicht-Checks für `main`.
+
 ---
 
 ## Datenmodell
