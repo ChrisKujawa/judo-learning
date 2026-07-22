@@ -56,8 +56,12 @@ export function useInstallPrompt(): InstallPromptControls {
     if (!promptEvent) return;
 
     setInstallPrompt(null);
-    await promptEvent.prompt();
-    await promptEvent.userChoice;
+    try {
+      await promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (error: unknown) {
+      console.error('App-Installation konnte nicht gestartet werden.', error);
+    }
   }, [installPrompt]);
 
   return {

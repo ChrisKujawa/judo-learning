@@ -1,16 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { InstallPrompt } from './InstallPrompt';
 
-async function dispatchBeforeInstallPrompt() {
+async function dispatchBeforeInstallPrompt({
+  prompt = vi.fn().mockResolvedValue(undefined),
+  userChoice = Promise.resolve({ outcome: 'accepted' as const, platform: 'web' }),
+} = {}) {
   const event = new Event('beforeinstallprompt', { cancelable: true }) as Event & {
-    prompt: ReturnType<typeof vi.fn>;
+    prompt: typeof prompt;
     userChoice: Promise<{ outcome: 'accepted'; platform: string }>;
   };
-  event.prompt = vi.fn().mockResolvedValue(undefined);
-  event.userChoice = Promise.resolve({ outcome: 'accepted', platform: 'web' });
+  event.prompt = prompt;
+  event.userChoice = userChoice;
 
   await act(async () => {
     window.dispatchEvent(event);
@@ -64,5 +67,22 @@ describe('InstallPrompt', () => {
     expect(installEvent.defaultPrevented).toBe(true);
     expect(installEvent.prompt).toHaveBeenCalledOnce();
     expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
+  });
+
+  it('handles rejected browser install prompts without an unhandled rejection', async () => {
+    const user = userEvent.setup();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const prompt = vi.fn().mockRejectedValue(new Error('Prompt rejected'));
+    render(<InstallPromptHarness />);
+    await dispatchBeforeInstallPrompt({ prompt });
+
+    await user.click(screen.getByTestId('install-btn'));
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        'App-Installation konnte nicht gestartet werden.',
+        expect.any(Error)
+      );
+    });
   });
 });

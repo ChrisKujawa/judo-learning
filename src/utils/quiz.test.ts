@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { shuffle, assignQuestionType, buildChoices, buildWertChoices, WERTE_DISTRACTORS, scoreEmoji, scoreColor } from '../utils/quiz';
 import type { Technique } from '../data/types';
 
@@ -66,6 +66,10 @@ describe('shuffle', () => {
 // ── assignQuestionType ────────────────────────────────────────────────────────
 
 describe('assignQuestionType', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('returns "judo-wert" for Judo-Werte techniques', () => {
     const t = makeTechnique({ category: 'Judo-Werte' });
     expect(assignQuestionType(t)).toBe('judo-wert');
@@ -76,11 +80,18 @@ describe('assignQuestionType', () => {
     expect(assignQuestionType(t)).toBe('term-to-meaning');
   });
 
-  it('returns either "image-to-name" or "term-to-meaning" for techniques with imageUrl', () => {
+  it('returns "image-to-name" for techniques with imageUrl when random is below 0.5', () => {
     const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
-    const results = new Set(Array.from({ length: 50 }, () => assignQuestionType(t)));
-    expect(results.has('image-to-name')).toBe(true);
-    expect(results.has('term-to-meaning')).toBe(true);
+    vi.spyOn(Math, 'random').mockReturnValue(0.49);
+
+    expect(assignQuestionType(t)).toBe('image-to-name');
+  });
+
+  it('returns "term-to-meaning" for techniques with imageUrl when random is at least 0.5', () => {
+    const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+    expect(assignQuestionType(t)).toBe('term-to-meaning');
   });
 
   it('does not return "image-to-name" when image questions are disabled', () => {
