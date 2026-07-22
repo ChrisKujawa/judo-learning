@@ -64,6 +64,8 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain('staleWhileRevalidate(request, event)');
     expect(serviceWorker).toContain('cache.match(request)');
     expect(serviceWorker).not.toContain('caches.match(request)');
+    expect(serviceWorker).toContain('then(async (response)');
+    expect(serviceWorker).toContain('await cache.put(request, response.clone())');
     expect(serviceWorker).toContain('event.waitUntil(refresh.catch(() => undefined))');
   });
 });

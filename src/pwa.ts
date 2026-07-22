@@ -28,9 +28,16 @@ export function registerServiceWorker({
 
   const { scriptUrl, scope } = createServiceWorkerRegistrationConfig(baseUrl);
 
-  window.addEventListener('load', () => {
+  const register = () => {
     void navigator.serviceWorker.register(scriptUrl, { scope }).catch((error: unknown) => {
       console.error('Service Worker konnte nicht registriert werden.', error);
     });
-  }, { once: true });
+  };
+
+  if (document.readyState === 'complete') {
+    register();
+    return;
+  }
+
+  window.addEventListener('load', register, { once: true });
 }
