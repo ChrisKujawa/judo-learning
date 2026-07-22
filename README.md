@@ -1,21 +1,21 @@
-# 🥋 Judo Learning App
+# 🥋 Judo-Lern-App
 
 Eine mobile-freundliche Web-App zum Lernen von Judo-Techniken und -Theorie für die Kyu-Graduierung — auf Deutsch.
 
-**Live:** [chriskujawa.github.io/judo-learning](https://chriskujawa.github.io/judo-learning/)
+**Online:** [chriskujawa.github.io/judo-learning](https://chriskujawa.github.io/judo-learning/)
 
 ---
 
-## Features
+## Funktionen
 
 - **8 Kyu-Grade** von Weiß-Gelb (8. Kyu) bis Braun (1. Kyu)
-- **Multiple-Choice-Quiz** mit zwei Lernmodi:
+- **Auswahlquiz** mit zwei Lernmodi:
   - 🇯🇵 → 🇩🇪 Japanischer Begriff → Deutsche Bedeutung
   - 🇩🇪 → 🇯🇵 Deutsche Bedeutung → Japanischer Begriff
 - **Kumulative Technik-Pools** — höhere Grade enthalten alle Techniken der Vorstufen
 - **Sofortiges Feedback** nach jeder Antwort mit Erklärungen
-- **Score-Übersicht** am Ende jeder Runde mit Emoji-Bewertung
-- Installierbar als mobile PWA mit App-Icon und Standalone-Modus
+- **Ergebnisübersicht** am Ende jeder Runde mit Emoji-Bewertung
+- Als mobile PWA installierbar, mit eigenem App-Symbol und Start im App-Fenster
 - Offline nutzbar, nachdem die App einmal online geöffnet wurde
 
 ## Technik-Daten
@@ -36,7 +36,7 @@ Inhalte basieren auf dem offiziellen DJB-Graduierungssystem:
 - Node.js 18+
 - npm
 
-### Setup
+### Einrichtung
 
 ```bash
 git clone https://github.com/ChrisKujawa/judo-learning.git
@@ -49,11 +49,11 @@ Die App läuft dann unter `http://localhost:5173/judo-learning/`.
 
 ### PWA und Offline-Nutzung
 
-Die App enthält ein Web-App-Manifest, eigene App-Icons und einen Service Worker für GitHub Pages unter `/judo-learning/`.
+Die App enthält ein Web-App-Manifest, eigene App-Symbole und einen Service Worker für GitHub Pages unter `/judo-learning/`.
 
-- Unterstützte mobile Browser zeigen in der App eine Schaltfläche **App installieren**, sobald der Browser das Installationsereignis bereitstellt.
-- Nach der Installation startet die App im Standalone-Modus.
-- Der Service Worker speichert die App-Shell inklusive Build-Assets, Manifest und Icons. Nach einem ersten Online-Aufruf kann die App-Shell auch offline geladen werden.
+- Unterstützte mobile Browser zeigen in der App eine Schaltfläche **App installieren**, sobald der Browser die Installation anbietet.
+- Nach der Installation startet die App in einem eigenen App-Fenster.
+- Der Service Worker speichert die grundlegenden App-Dateien inklusive erzeugter Dateien, Manifest und App-Symbolen. Nach einem ersten Online-Aufruf kann die App auch offline geladen werden.
 - Navigationsanfragen fallen offline auf die zwischengespeicherte Startseite zurück.
 
 ### Verfügbare Befehle
@@ -84,7 +84,7 @@ src/
 │   └── grades.ts           # 8 Grad-Objekte mit kumulativen Techniken
 ├── utils/
 │   └── quiz.ts             # Reine Hilfsfunktionen (shuffle, buildChoices, …)
-├── pwa.ts                  # Service-Worker-Registrierung
+├── pwa.ts                  # Registrierung des Service Workers
 └── test/
     └── setup.ts            # Vitest + Testing Library Setup
 ```
