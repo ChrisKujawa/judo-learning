@@ -62,6 +62,8 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain("request.mode === 'navigate'");
     expect(serviceWorker).toContain('cache.match(INDEX_URL)');
     expect(serviceWorker).toContain('staleWhileRevalidate(request, event)');
+    expect(serviceWorker).toContain('cache.match(request)');
+    expect(serviceWorker).not.toContain('caches.match(request)');
     expect(serviceWorker).toContain('event.waitUntil(refresh.catch(() => undefined))');
   });
 });

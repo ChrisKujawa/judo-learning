@@ -88,7 +88,7 @@ async function networkFirstNavigation(request) {
 
 async function staleWhileRevalidate(request, event) {
   const cache = await caches.open(CACHE_NAME);
-  const cached = await caches.match(request);
+  const cached = await cache.match(request);
   const refresh = fetch(request).then((response) => {
     if (response.ok) {
       void cache.put(request, response.clone());
