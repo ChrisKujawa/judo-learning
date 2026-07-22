@@ -60,6 +60,11 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain('`${BASE_PATH}icons/icon-512.png`');
     expect(serviceWorker).toContain('`${BASE_PATH}icons/maskable-512.png`');
     expect(serviceWorker).toContain("request.mode === 'navigate'");
+    expect(serviceWorker).toContain('await cacheIndexAndBuildAssets(cache, response.clone())');
+    expect(serviceWorker).toContain('const indexResponse = response.clone()');
+    expect(serviceWorker.indexOf('await cache.addAll([...new Set(assetUrls)])')).toBeLessThan(
+      serviceWorker.indexOf('await cache.put(INDEX_URL, indexResponse)')
+    );
     expect(serviceWorker).toContain('cache.match(INDEX_URL)');
     expect(serviceWorker).toContain('staleWhileRevalidate(request, event)');
     expect(serviceWorker).toContain('cache.match(request)');

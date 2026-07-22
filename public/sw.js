@@ -60,7 +60,11 @@ async function cacheBuildAssets(cache) {
     throw new Error(`App-Shell konnte nicht geladen werden: ${response.status}`);
   }
 
-  await cache.put(INDEX_URL, response.clone());
+  await cacheIndexAndBuildAssets(cache, response);
+}
+
+async function cacheIndexAndBuildAssets(cache, response) {
+  const indexResponse = response.clone();
   const html = await response.text();
   const assetUrls = Array.from(html.matchAll(/(?:href|src)="([^"]+)"/g), ([, url]) => url)
     .filter((url) => url.startsWith(BASE_PATH) && url.includes('/assets/'));
@@ -68,6 +72,8 @@ async function cacheBuildAssets(cache) {
   if (assetUrls.length > 0) {
     await cache.addAll([...new Set(assetUrls)]);
   }
+
+  await cache.put(INDEX_URL, indexResponse);
 }
 
 async function networkFirstNavigation(request) {
@@ -76,7 +82,7 @@ async function networkFirstNavigation(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
-      await cache.put(INDEX_URL, response.clone());
+      await cacheIndexAndBuildAssets(cache, response.clone());
     }
     return response;
   } catch (error) {
