@@ -18,7 +18,7 @@ interface Question {
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
 export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
-  const allowImageQuestions = navigator.onLine;
+  const [allowImageQuestions] = useState(() => navigator.onLine);
   const questions: Question[] = useMemo(
     () => shuffle(grade.techniques).map((t) => ({
       technique: t,
