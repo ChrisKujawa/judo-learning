@@ -15,7 +15,8 @@ Eine mobile-freundliche Web-App zum Lernen von Judo-Techniken und -Theorie für 
 - **Kumulative Technik-Pools** — höhere Grade enthalten alle Techniken der Vorstufen
 - **Sofortiges Feedback** nach jeder Antwort mit Erklärungen
 - **Score-Übersicht** am Ende jeder Runde mit Emoji-Bewertung
-- Mobiloptimiert, funktioniert offline (PWA-ready)
+- Installierbar als mobile PWA mit App-Icon und Standalone-Modus
+- Offline nutzbar, nachdem die App einmal online geöffnet wurde
 
 ## Technik-Daten
 
@@ -46,6 +47,15 @@ npm run dev
 
 Die App läuft dann unter `http://localhost:5173/judo-learning/`.
 
+### PWA und Offline-Nutzung
+
+Die App enthält ein Web-App-Manifest, eigene App-Icons und einen Service Worker für GitHub Pages unter `/judo-learning/`.
+
+- Unterstützte mobile Browser zeigen in der App eine Schaltfläche **App installieren**, sobald der Browser das Installationsereignis bereitstellt.
+- Nach der Installation startet die App im Standalone-Modus.
+- Der Service Worker speichert die App-Shell inklusive Build-Assets, Manifest und Icons. Nach einem ersten Online-Aufruf kann die App-Shell auch offline geladen werden.
+- Navigationsanfragen fallen offline auf die zwischengespeicherte Startseite zurück.
+
 ### Verfügbare Befehle
 
 | Befehl | Beschreibung |
@@ -66,7 +76,7 @@ Die App läuft dann unter `http://localhost:5173/judo-learning/`.
 src/
 ├── components/
 │   ├── GradeSelector.tsx   # Grad-Auswahl (8. Kyu → 1. Kyu)
-│   ├── ModeSelector.tsx    # Quiz-Modus-Auswahl
+│   ├── InstallPrompt.tsx   # Installationshinweis für unterstützte Browser
 │   └── Quiz.tsx            # Haupt-Quiz-Logik & Score-Screen
 ├── data/
 │   ├── types.ts            # Technique, Grade, QuizMode Typen
@@ -74,6 +84,7 @@ src/
 │   └── grades.ts           # 8 Grad-Objekte mit kumulativen Techniken
 ├── utils/
 │   └── quiz.ts             # Reine Hilfsfunktionen (shuffle, buildChoices, …)
+├── pwa.ts                  # Service-Worker-Registrierung
 └── test/
     └── setup.ts            # Vitest + Testing Library Setup
 ```
@@ -82,7 +93,7 @@ src/
 
 ## Tests
 
-85 Tests über 6 Dateien mit Vitest + Testing Library:
+Vitest + Testing Library prüfen Komponenten, Datenintegrität, Fortschritt und PWA-Verhalten:
 
 ```bash
 npm test
@@ -91,9 +102,10 @@ npm test
 - `src/utils/quiz.test.ts` — Reine Util-Funktionen
 - `src/data/data.test.ts` — Datenintegrität aller Techniken
 - `src/components/GradeSelector.test.tsx`
-- `src/components/ModeSelector.test.tsx`
+- `src/components/InstallPrompt.test.tsx`
 - `src/components/Quiz.test.tsx`
-- `src/App.test.tsx` — Integrationstests
+- `src/App.test.tsx` - Integrationstests
+- `src/pwa.test.ts` und `src/pwa-assets.test.ts` - Service Worker, Manifest und Offline-App-Shell
 
 ---
 

@@ -1,5 +1,6 @@
 import type { Grade } from '../data/types';
 import { calculateAccuracy, type ProgressStats } from '../utils/progress';
+import { InstallPrompt } from './InstallPrompt';
 
 interface GradeSelectorProps {
   grades: Grade[];
@@ -25,6 +26,8 @@ export function GradeSelector({ grades, progress, onSelect, onResetProgress }: G
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Judo Lernen</h1>
         <p className="text-gray-500">Wähle deinen Gürtelgrad zum Üben</p>
       </div>
+
+      <InstallPrompt />
 
       {progress && (
         <section

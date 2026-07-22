@@ -1,0 +1,38 @@
+{
+  "name": "Judo Lernen",
+  "short_name": "Judo",
+  "description": "Judo-Techniken und Theorie für die Kyu-Graduierung mobil üben.",
+  "lang": "de",
+  "start_url": "/judo-learning/",
+  "scope": "/judo-learning/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#16a34a",
+  "background_color": "#f9fafb",
+  "icons": [
+    {
+      "src": "/judo-learning/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/judo-learning/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/judo-learning/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/judo-learning/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

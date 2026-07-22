@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Judo Lernen">
+  <rect width="512" height="512" rx="112" fill="#16a34a"/>
+  <circle cx="256" cy="132" r="58" fill="#f9fafb"/>
+  <path fill="#f9fafb" d="M154 208h204c26 0 46 21 46 46v130c0 18-14 32-32 32H140c-18 0-32-14-32-32V254c0-25 20-46 46-46Z"/>
+  <path fill="#16a34a" d="M176 248h160v42H176zM176 322h160v42H176z"/>
+  <path fill="#14532d" d="M142 380h228v38H142z"/>
+  <path fill="#facc15" d="M205 380h102v38H205z"/>
+</svg>
