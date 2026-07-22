@@ -18,9 +18,13 @@ interface Question {
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
 export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
+  const allowImageQuestions = navigator.onLine;
   const questions: Question[] = useMemo(
-    () => shuffle(grade.techniques).map((t) => ({ technique: t, type: assignQuestionType(t) })),
-    [grade.techniques]
+    () => shuffle(grade.techniques).map((t) => ({
+      technique: t,
+      type: assignQuestionType(t, { allowImageQuestions }),
+    })),
+    [allowImageQuestions, grade.techniques]
   );
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

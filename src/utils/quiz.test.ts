@@ -83,6 +83,14 @@ describe('assignQuestionType', () => {
     expect(results.has('term-to-meaning')).toBe(true);
   });
 
+  it('does not return "image-to-name" when image questions are disabled', () => {
+    const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
+    const results = new Set(
+      Array.from({ length: 50 }, () => assignQuestionType(t, { allowImageQuestions: false }))
+    );
+    expect(results).toEqual(new Set(['term-to-meaning']));
+  });
+
   it('never returns "judo-wert" for non-Werte techniques', () => {
     const t = makeTechnique({ category: 'Koshi-Waza', imageUrl: 'https://example.com/img.jpg' });
     for (let i = 0; i < 20; i++) {

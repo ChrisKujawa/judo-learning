@@ -1,5 +1,9 @@
 import type { Technique, QuestionType } from '../data/types';
 
+interface AssignQuestionTypeOptions {
+  allowImageQuestions?: boolean;
+}
+
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -12,12 +16,17 @@ export function shuffle<T>(arr: T[]): T[] {
 /**
  * Assigns a question type to a technique.
  * - Judo-Werte always get 'judo-wert'
- * - Techniques with an image randomly get 'image-to-name' or 'term-to-meaning' (50/50)
+ * - Techniques with an image randomly get 'image-to-name' or 'term-to-meaning' (50/50) when images are available
  * - Everything else gets 'term-to-meaning'
  */
-export function assignQuestionType(technique: Technique): QuestionType {
+export function assignQuestionType(
+  technique: Technique,
+  { allowImageQuestions = true }: AssignQuestionTypeOptions = {}
+): QuestionType {
   if (technique.category === 'Judo-Werte') return 'judo-wert';
-  if (technique.imageUrl) return Math.random() < 0.5 ? 'image-to-name' : 'term-to-meaning';
+  if (allowImageQuestions && technique.imageUrl) {
+    return Math.random() < 0.5 ? 'image-to-name' : 'term-to-meaning';
+  }
   return 'term-to-meaning';
 }
 
