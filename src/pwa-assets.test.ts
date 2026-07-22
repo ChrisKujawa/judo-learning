@@ -52,7 +52,8 @@ describe('PWA assets', () => {
   it('caches the app shell and falls back to the cached index for offline navigation', () => {
     const serviceWorker = readFileSync(join(root, 'public', 'sw.js'), 'utf8');
 
-    expect(serviceWorker).toContain("const BASE_PATH = '/judo-learning/'");
+    expect(serviceWorker).toContain('new URL(self.registration.scope)');
+    expect(serviceWorker).toContain('SCOPE_URL.pathname.endsWith');
     expect(serviceWorker).toContain('APP_SHELL_URLS');
     expect(serviceWorker).toContain('`${BASE_PATH}manifest.webmanifest`');
     expect(serviceWorker).toContain('`${BASE_PATH}icons/icon-192.png`');
@@ -60,5 +61,7 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain('`${BASE_PATH}icons/maskable-512.png`');
     expect(serviceWorker).toContain("request.mode === 'navigate'");
     expect(serviceWorker).toContain('cache.match(INDEX_URL)');
+    expect(serviceWorker).toContain('staleWhileRevalidate(request, event)');
+    expect(serviceWorker).toContain('event.waitUntil(refresh.catch(() => undefined))');
   });
 });

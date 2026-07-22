@@ -1,6 +1,7 @@
 const CACHE_VERSION = 'v1';
 const CACHE_NAME = `judo-learning-${CACHE_VERSION}`;
-const BASE_PATH = '/judo-learning/';
+const SCOPE_URL = new URL(self.registration.scope);
+const BASE_PATH = SCOPE_URL.pathname.endsWith('/') ? SCOPE_URL.pathname : `${SCOPE_URL.pathname}/`;
 const INDEX_URL = `${BASE_PATH}index.html`;
 const APP_SHELL_URLS = [
   BASE_PATH,
@@ -50,7 +51,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(cacheFirst(request));
+  event.respondWith(staleWhileRevalidate(request, event));
 });
 
 async function cacheBuildAssets(cache) {
@@ -85,14 +86,20 @@ async function networkFirstNavigation(request) {
   }
 }
 
-async function cacheFirst(request) {
+async function staleWhileRevalidate(request, event) {
+  const cache = await caches.open(CACHE_NAME);
   const cached = await caches.match(request);
-  if (cached) return cached;
+  const refresh = fetch(request).then((response) => {
+    if (response.ok) {
+      void cache.put(request, response.clone());
+    }
+    return response;
+  });
 
-  const response = await fetch(request);
-  if (response.ok) {
-    const cache = await caches.open(CACHE_NAME);
-    await cache.put(request, response.clone());
+  if (cached) {
+    event.waitUntil(refresh.catch(() => undefined));
+    return cached;
   }
-  return response;
+
+  return refresh;
 }
