@@ -20,10 +20,19 @@ async function dispatchBeforeInstallPrompt() {
 
 describe('InstallPrompt', () => {
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
   it('stays hidden until the browser exposes an install prompt', () => {
+    render(<InstallPrompt />);
+
+    expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
+  });
+
+  it('renders safely when matchMedia is unavailable', () => {
+    vi.stubGlobal('matchMedia', undefined);
+
     render(<InstallPrompt />);
 
     expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();

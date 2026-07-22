@@ -17,7 +17,7 @@ type StandaloneNavigator = Navigator & {
 
 function isStandalone() {
   return (
-    window.matchMedia?.('(display-mode: standalone)').matches ||
+    Boolean(window.matchMedia?.('(display-mode: standalone)')?.matches) ||
     Boolean((window.navigator as StandaloneNavigator).standalone)
   );
 }
