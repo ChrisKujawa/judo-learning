@@ -1,42 +1,42 @@
-# 🥋 Judo-Lern-App
+# 🥋 Judo Learning App
 
-Eine mobile-freundliche Web-App zum Lernen von Judo-Techniken und -Theorie für die Kyu-Graduierung — auf Deutsch.
+A mobile-friendly web app for learning Judo techniques and theory for Kyu grading. The app UI and quiz content are in German.
 
-**Online:** [chriskujawa.github.io/judo-learning](https://chriskujawa.github.io/judo-learning/)
-
----
-
-## Funktionen
-
-- **8 Kyu-Grade** von Weiß-Gelb (8. Kyu) bis Braun (1. Kyu)
-- **Auswahlquiz** mit zwei Lernmodi:
-  - 🇯🇵 → 🇩🇪 Japanischer Begriff → Deutsche Bedeutung
-  - 🇩🇪 → 🇯🇵 Deutsche Bedeutung → Japanischer Begriff
-- **Kumulative Technik-Pools** — höhere Grade enthalten alle Techniken der Vorstufen
-- **Sofortiges Feedback** nach jeder Antwort mit Erklärungen
-- **Ergebnisübersicht** am Ende jeder Runde mit Emoji-Bewertung
-- Als mobile PWA installierbar, mit eigenem App-Symbol und Start im App-Fenster
-- Offline nutzbar, nachdem die App einmal online geöffnet wurde
-
-## Technik-Daten
-
-Inhalte basieren auf dem offiziellen DJB-Graduierungssystem:
-- Grundbegriffe (Dojo, Judogi, Rei, …)
-- Judo-Werte (Jita Kyoei, Seiryoku Zenyo, …)
-- Wurftechniken: Ashi-Waza, Te-Waza, Koshi-Waza, Sutemi-Waza
-- Bodentechniken: Osaekomi-Waza, Kansetsu-Waza, Shime-Waza
-- Grundstellungen, Fallübungen, Kampfbegriffe
+**Live:** [chriskujawa.github.io/judo-learning](https://chriskujawa.github.io/judo-learning/)
 
 ---
 
-## Lokale Entwicklung
+## Features
 
-### Voraussetzungen
+- **8 Kyu grades** from white-yellow (8th Kyu) to brown (1st Kyu)
+- **Multiple-choice quiz** with two learning directions:
+  - 🇯🇵 → 🇩🇪 Japanese term → German meaning
+  - 🇩🇪 → 🇯🇵 German meaning → Japanese term
+- **Cumulative technique pools** so higher grades include all techniques from previous levels
+- **Immediate feedback** after each answer with explanations
+- **Score summary** at the end of each round with emoji rating
+- Installable as a mobile PWA with app-owned icons and standalone launch
+- Offline-capable after the app has been opened once online
+
+## Technique data
+
+Content is based on the official DJB grading system:
+- Basic terms (Dojo, Judogi, Rei, ...)
+- Judo values (Jita Kyoei, Seiryoku Zenyo, ...)
+- Throwing techniques: Ashi-Waza, Te-Waza, Koshi-Waza, Sutemi-Waza
+- Ground techniques: Osaekomi-Waza, Kansetsu-Waza, Shime-Waza
+- Basic stances, breakfalls, contest terms
+
+---
+
+## Local development
+
+### Requirements
 
 - Node.js 18+
 - npm
 
-### Einrichtung
+### Setup
 
 ```bash
 git clone https://github.com/ChrisKujawa/judo-learning.git
@@ -45,101 +45,101 @@ npm install
 npm run dev
 ```
 
-Die App läuft dann unter `http://localhost:5173/judo-learning/`.
+The app runs at `http://localhost:5173/judo-learning/`.
 
-### PWA und Offline-Nutzung
+### PWA and offline use
 
-Die App enthält ein Web-App-Manifest, eigene App-Symbole und einen Service Worker für GitHub Pages unter `/judo-learning/`.
+The app includes a web app manifest, app-owned icons, and a service worker for GitHub Pages under `/judo-learning/`.
 
-- Unterstützte mobile Browser zeigen in der App eine Schaltfläche **App installieren**, sobald der Browser die Installation anbietet.
-- Nach der Installation startet die App in einem eigenen App-Fenster.
-- Der Service Worker speichert die grundlegenden App-Dateien inklusive erzeugter Dateien, Manifest und App-Symbolen. Nach einem ersten Online-Aufruf kann die App auch offline geladen werden.
-- Navigationsanfragen fallen offline auf die zwischengespeicherte Startseite zurück.
+- Supported mobile browsers show an in-app **App installieren** button when the browser exposes the install prompt.
+- After installation, the app launches in standalone mode.
+- The service worker caches the app shell, generated build assets, manifest, and icons. After the first online visit, the app shell can load offline.
+- Offline navigation falls back to the cached start page.
 
-### Verfügbare Befehle
+### Available commands
 
-| Befehl | Beschreibung |
+| Command | Description |
 |--------|-------------|
-| `npm run dev` | Entwicklungsserver starten |
-| `npm run build` | Produktionsbuild erstellen |
-| `npm run preview` | Produktionsbuild lokal vorschauen |
-| `npm test` | Tests einmalig ausführen |
-| `npm run test:watch` | Tests im Watch-Modus |
-| `npm run test:coverage` | Tests mit Coverage-Report |
-| `npm run lint` | ESLint ausführen |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview the production build locally |
+| `npm test` | Run tests once |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage |
+| `npm run lint` | Run ESLint |
 
 ---
 
-## Projektstruktur
+## Project structure
 
 ```
 src/
 ├── components/
-│   ├── GradeSelector.tsx   # Grad-Auswahl (8. Kyu → 1. Kyu)
-│   ├── InstallPrompt.tsx   # Installationshinweis für unterstützte Browser
-│   └── Quiz.tsx            # Haupt-Quiz-Logik & Score-Screen
+│   ├── GradeSelector.tsx   # Grade selection (8th Kyu -> 1st Kyu)
+│   ├── InstallPrompt.tsx   # Install prompt for supported browsers
+│   └── Quiz.tsx            # Main quiz logic and score screen
 ├── data/
-│   ├── types.ts            # Technique, Grade, QuizMode Typen
-│   ├── techniques.ts       # ~55 Techniken mit DJB-Daten
-│   └── grades.ts           # 8 Grad-Objekte mit kumulativen Techniken
+│   ├── types.ts            # Technique, Grade, QuizMode types
+│   ├── techniques.ts       # ~55 techniques with DJB data
+│   └── grades.ts           # 8 grade objects with cumulative techniques
 ├── utils/
-│   └── quiz.ts             # Reine Hilfsfunktionen (shuffle, buildChoices, …)
-├── pwa.ts                  # Registrierung des Service Workers
+│   └── quiz.ts             # Pure helpers (shuffle, buildChoices, ...)
+├── pwa.ts                  # Service worker registration
 └── test/
-    └── setup.ts            # Vitest + Testing Library Setup
+    └── setup.ts            # Vitest and Testing Library setup
 ```
 
 ---
 
 ## Tests
 
-Vitest + Testing Library prüfen Komponenten, Datenintegrität, Fortschritt und PWA-Verhalten:
+Vitest and Testing Library cover components, data integrity, progress tracking, and PWA behavior:
 
 ```bash
 npm test
 ```
 
-- `src/utils/quiz.test.ts` — Reine Util-Funktionen
-- `src/data/data.test.ts` — Datenintegrität aller Techniken
+- `src/utils/quiz.test.ts` - Pure utility functions
+- `src/data/data.test.ts` - Data integrity for all techniques
 - `src/components/GradeSelector.test.tsx`
 - `src/components/InstallPrompt.test.tsx`
 - `src/components/Quiz.test.tsx`
-- `src/App.test.tsx` - Integrationstests
-- `src/pwa.test.ts` und `src/pwa-assets.test.ts` - Service Worker, Manifest und Offline-App-Shell
+- `src/App.test.tsx` - Integration tests
+- `src/pwa.test.ts` and `src/pwa-assets.test.ts` - Service worker, manifest, and offline app shell
 
 ---
 
 ## CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): Tests auf jedem Push und Pull Request
-- **Deploy** (`.github/workflows/deploy.yml`): Tests → Build → Deploy auf GitHub Pages bei Push auf `main`
+- **CI** (`.github/workflows/ci.yml`): tests on every push and pull request
+- **Deploy** (`.github/workflows/deploy.yml`): tests, build, deploy to GitHub Pages on pushes to `main`
 
-### Abhängigkeits-Updates
+### Dependency updates
 
-Renovate verwaltet npm- und GitHub-Actions-Updates über `renovate.json`. Geeignete Dependency- und Lockfile-PRs aktivieren GitHub Auto-Merge, der Merge erfolgt erst nach erfolgreichen Pflicht-Checks für `main`.
+Renovate manages npm and GitHub Actions updates through `renovate.json`. Eligible dependency and lockfile PRs enable GitHub auto-merge, and merging only happens after required checks for `main` pass.
 
 ---
 
-## Datenmodell
+## Data model
 
 ```ts
 interface Technique {
   id: string;
-  term: string;          // Japanischer Begriff (z.B. "O-Goshi")
-  meaning: string;       // Deutsche Bedeutung (z.B. "Große Hüfte")
-  translation?: string;  // Wort-für-Wort-Übersetzung
-  category: string;      // z.B. "Koshi-Waza"
-  comment?: string;      // Pädagogischer Hinweis
-  link?: string;         // Link zu judo.how
-  introducedAt: number;  // Kyu-Stufe der Einführung (8=Anfänger, 1=Braun)
+  term: string;          // Japanese term, for example "O-Goshi"
+  meaning: string;       // German meaning, for example "Große Hüfte"
+  translation?: string;  // Literal word-by-word translation
+  category: string;      // For example "Koshi-Waza"
+  comment?: string;      // Teaching hint
+  link?: string;         // Link to judo.how
+  introducedAt: number;  // Kyu level first required (8=beginner, 1=brown)
 }
 ```
 
 ---
 
-## Quellen
+## Sources
 
-- [judo.how](https://judo.how/) — Technik-Referenzen
+- [judo.how](https://judo.how/) - Technique references
 - [DJB *Anforderungen für Kyu-Grade 2025* (PDF)](https://www.judobund.de/service/download-center)
 - [DJB *Kyu-Graduierungssystem Technik-Pools* (PDF)](https://www.judobund.de/service/download-center/19)
-- [DJB Download-Center](https://www.judobund.de/service/download-center) — alle offiziellen Dokumente inkl. Judo-Werte Plakat
+- [DJB Download-Center](https://www.judobund.de/service/download-center) - Official source for all DJB documents, including the Judo values poster
