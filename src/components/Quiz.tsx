@@ -1,10 +1,13 @@
 import { useState, useMemo } from 'react';
 import type { Grade, Technique, QuestionType } from '../data/types';
 import { shuffle, assignQuestionType, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
+import { calculateAccuracy, type CompletedQuiz, type CompletedQuizAnswer, type ProgressStats } from '../utils/progress';
 
 interface QuizProps {
   grade: Grade;
+  progress?: ProgressStats;
   onBack: () => void;
+  onComplete?: (quiz: CompletedQuiz) => void;
 }
 
 interface Question {
@@ -14,7 +17,7 @@ interface Question {
 
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
-export function Quiz({ grade, onBack }: QuizProps) {
+export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
   const questions: Question[] = useMemo(
     () => shuffle(grade.techniques).map((t) => ({ technique: t, type: assignQuestionType(t) })),
     [grade.techniques]
@@ -23,6 +26,7 @@ export function Quiz({ grade, onBack }: QuizProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>('unanswered');
   const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<CompletedQuizAnswer[]>([]);
   const [finished, setFinished] = useState(false);
 
   const { technique: current, type: questionType } = questions[index];
@@ -57,8 +61,15 @@ export function Quiz({ grade, onBack }: QuizProps) {
 
   function handleSelect(choice: string) {
     if (answerState !== 'unanswered') return;
+
+    const isCorrect = choice === correctAnswer;
     setSelected(choice);
-    if (choice === correctAnswer) {
+    setAnswers((currentAnswers) => [
+      ...currentAnswers,
+      { techniqueId: current.id, correct: isCorrect },
+    ]);
+
+    if (isCorrect) {
       setAnswerState('correct');
       setScore((s) => s + 1);
     } else {
@@ -68,6 +79,14 @@ export function Quiz({ grade, onBack }: QuizProps) {
 
   function handleNext() {
     if (index + 1 >= questions.length) {
+      onComplete?.({
+        gradeId: grade.id,
+        gradeName: grade.name,
+        completedAt: new Date().toISOString(),
+        score,
+        totalQuestions: questions.length,
+        answers,
+      });
       setFinished(true);
     } else {
       setIndex((i) => i + 1);
@@ -78,9 +97,13 @@ export function Quiz({ grade, onBack }: QuizProps) {
 
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
+    const totalAccuracy = progress
+      ? calculateAccuracy(progress.totalCorrectAnswers, progress.totalAnswers)
+      : 0;
+
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-sm text-center">
+        <div className="w-full max-w-sm text-center" data-testid="score-screen">
           <div className="text-7xl mb-4" data-testid="score-emoji">{scoreEmoji(pct)}</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Quiz beendet!</h2>
           <p className="text-gray-500 mb-1" data-testid="score-text">
@@ -100,6 +123,20 @@ export function Quiz({ grade, onBack }: QuizProps) {
               data-testid="score-bar"
             />
           </div>
+          {progress && progress.totalQuizzesCompleted > 0 && (
+            <div
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6 text-left"
+              data-testid="score-stats-summary"
+            >
+              <h3 className="font-bold text-gray-800 mb-2">Dein Lernstand</h3>
+              <p className="text-sm text-gray-600">
+                Insgesamt {progress.totalQuizzesCompleted} Quiz abgeschlossen, {totalAccuracy}% richtig.
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                Bestwert: {progress.bestScorePercentage}%
+              </p>
+            </div>
+          )}
           <button
             onClick={onBack}
             className="w-full bg-gray-800 text-white font-semibold py-4 rounded-2xl mb-3 active:scale-95 transition-transform"
