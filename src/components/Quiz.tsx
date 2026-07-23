@@ -56,7 +56,11 @@ export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
 
   // Show image before answering only for image-to-name; after answering for term-to-meaning
   const showImageBefore = questionType === 'image-to-name' && !!current.imageUrl;
-  const showImageAfter  = questionType === 'term-to-meaning' && !!current.imageUrl && answerState !== 'unanswered';
+  const showImageAfter =
+    allowImageQuestions &&
+    questionType === 'term-to-meaning' &&
+    !!current.imageUrl &&
+    answerState !== 'unanswered';
 
   const label =
     questionType === 'judo-wert' ? 'Judo-Wert erkennen' :

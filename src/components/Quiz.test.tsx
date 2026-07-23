@@ -360,6 +360,17 @@ describe('Quiz – image questions', () => {
     expect(screen.queryByTestId('technique-image-before')).not.toBeInTheDocument();
   });
 
+  it('does not show external technique images after answering while offline', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(screen.queryByTestId('technique-image-after')).not.toBeInTheDocument();
+  });
+
   it('keeps the quiz question type stable when connectivity changes during a quiz', async () => {
     const user = userEvent.setup();
     const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
