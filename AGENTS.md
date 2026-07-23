@@ -32,6 +32,7 @@ A mobile-friendly quiz app for learning Judo theory (Japanese terms, technique n
 - `vitest.config.ts` MUST import `defineConfig` from `vitest/config`, **not** from `vite`. Using the Vite import causes `tsc` to reject the `test` property during `npm run build`.
 - `vite.config.ts` must NOT contain a `test` block.
 - Vite `base` is set to `'/judo-learning/'` — required for GitHub Pages subfolder hosting.
+- README and contributor-facing documentation are English; only the app UI and quiz content are German.
 - All user-facing text is in **German**. Japanese terms are shown as quiz prompts; German meanings are the answer options (and vice versa in the reverse mode).
 
 ---
