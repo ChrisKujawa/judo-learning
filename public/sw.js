@@ -4,8 +4,6 @@ const SCOPE_URL = new URL(self.registration.scope);
 const BASE_PATH = SCOPE_URL.pathname.endsWith('/') ? SCOPE_URL.pathname : `${SCOPE_URL.pathname}/`;
 const INDEX_URL = `${BASE_PATH}index.html`;
 const APP_SHELL_URLS = [
-  BASE_PATH,
-  INDEX_URL,
   `${BASE_PATH}manifest.webmanifest`,
   `${BASE_PATH}icons/icon.svg`,
   `${BASE_PATH}icons/icon-192.png`,
