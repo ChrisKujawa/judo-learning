@@ -124,6 +124,10 @@ npm test
 
 Renovate manages npm and GitHub Actions updates through `renovate.json`. Eligible dependency and lockfile PRs enable GitHub auto-merge, and merging only happens after the required checks for `main` pass.
 
+### Usage analytics
+
+The production app uses GoatCounter for privacy-friendly page-view analytics on the deployed GitHub Pages site. Local development and tests do not load the analytics script.
+
 ---
 
 ## Data model
