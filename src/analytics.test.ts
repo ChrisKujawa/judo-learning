@@ -1,9 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   type AnalyticsDocument,
   GOATCOUNTER_ENDPOINT,
   GOATCOUNTER_SCRIPT_SRC,
   registerAnalytics,
+  trackAnalyticsEvent,
 } from './analytics';
 
 function goatCounterScripts() {
@@ -53,5 +54,42 @@ describe('registerAnalytics', () => {
     registerAnalytics({ documentRef, isProduction: true });
 
     expect(scripts).toHaveLength(1);
+  });
+});
+
+describe('trackAnalyticsEvent', () => {
+  it('does not send GoatCounter events outside production builds', () => {
+    const count = vi.fn();
+
+    trackAnalyticsEvent(
+      { path: 'quiz-started-kyu8', title: 'Quiz started: 8. Kyu' },
+      { isProduction: false, windowRef: { goatcounter: { count } } }
+    );
+
+    expect(count).not.toHaveBeenCalled();
+  });
+
+  it('does not fail when GoatCounter has not loaded yet', () => {
+    expect(() =>
+      trackAnalyticsEvent(
+        { path: 'quiz-started-kyu8', title: 'Quiz started: 8. Kyu' },
+        { isProduction: true, windowRef: {} }
+      )
+    ).not.toThrow();
+  });
+
+  it('sends custom GoatCounter events in production builds', () => {
+    const count = vi.fn();
+
+    trackAnalyticsEvent(
+      { path: 'quiz-finished-kyu8', title: 'Quiz finished: 8. Kyu (100%)' },
+      { isProduction: true, windowRef: { goatcounter: { count } } }
+    );
+
+    expect(count).toHaveBeenCalledWith({
+      path: 'quiz-finished-kyu8',
+      title: 'Quiz finished: 8. Kyu (100%)',
+      event: true,
+    });
   });
 });

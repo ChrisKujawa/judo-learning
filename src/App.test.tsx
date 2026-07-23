@@ -1,13 +1,19 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { trackAnalyticsEvent } from './analytics';
 import App from './App';
 import { grades } from './data/grades';
 import { PROGRESS_STORAGE_KEY, createEmptyProgress } from './utils/progress';
 
+vi.mock('./analytics', () => ({
+  trackAnalyticsEvent: vi.fn(),
+}));
+
 describe('App – integration', () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.mocked(trackAnalyticsEvent).mockClear();
   });
 
   it('shows the GradeSelector (home screen) on initial render', () => {
@@ -108,6 +114,22 @@ describe('App – integration', () => {
     });
   });
 
+  it('tracks the selected Kyu grade and quiz start', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+
+    expect(trackAnalyticsEvent).toHaveBeenNthCalledWith(1, {
+      path: 'kyu-selected-kyu8',
+      title: 'Kyu selected: 8. Kyu – Weiß-Gelb',
+    });
+    expect(trackAnalyticsEvent).toHaveBeenNthCalledWith(2, {
+      path: 'quiz-started-kyu8',
+      title: 'Quiz started: 8. Kyu – Weiß-Gelb',
+    });
+  });
+
   it('persists completed quiz stats locally', async () => {
     const user = userEvent.setup();
     const kyu8QuestionCount = grades.find((grade) => grade.id === 'kyu8')?.techniques.length;
@@ -133,6 +155,22 @@ describe('App – integration', () => {
           bestScorePercentage: 100,
         },
       },
+    });
+  });
+
+  it('tracks completed quizzes with the Kyu grade and score percentage', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+    while (!screen.queryByTestId('score-screen')) {
+      await user.click(screen.getAllByTestId('choice-correct')[0]);
+      await user.click(screen.getByTestId('next-btn'));
+    }
+
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'quiz-finished-kyu8',
+      title: 'Quiz finished: 8. Kyu – Weiß-Gelb (100%)',
     });
   });
 
