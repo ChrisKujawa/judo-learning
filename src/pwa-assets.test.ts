@@ -79,6 +79,8 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain('await cacheIndexAndBuildAssets(cache, response.clone())');
     expect(serviceWorker).toContain('const indexResponse = response.clone()');
     expect(serviceWorker).toContain('cacheBuildAsset(cache, assetUrl)');
+    expect(serviceWorker).toContain('const cached = await cache.match(assetUrl)');
+    expect(serviceWorker).toContain('if (cached) return');
     expect(serviceWorker).toContain('console.warn(`Build-Asset konnte nicht zwischengespeichert werden: ${assetUrl}`)');
     expect(serviceWorker).not.toContain('cache.addAll([...new Set(assetUrls)])');
     expect(serviceWorker.indexOf('await Promise.all([...new Set(assetUrls)].map')).toBeLessThan(

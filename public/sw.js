@@ -80,6 +80,9 @@ async function cacheIndexAndBuildAssets(cache, response) {
 }
 
 async function cacheBuildAsset(cache, assetUrl) {
+  const cached = await cache.match(assetUrl);
+  if (cached) return;
+
   try {
     const response = await fetch(assetUrl);
     if (!response.ok) {
