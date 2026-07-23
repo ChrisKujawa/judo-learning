@@ -67,7 +67,8 @@ describe('PWA assets', () => {
     expect(serviceWorker).toContain('new URL(self.registration.scope)');
     expect(serviceWorker).toContain('SCOPE_URL.pathname.endsWith');
     expect(serviceWorker).toContain('APP_SHELL_URLS');
-    expect(serviceWorker).not.toContain('  BASE_PATH,\n  INDEX_URL,');
+    const appShellUrls = serviceWorker.match(/const APP_SHELL_URLS = \[([\s\S]*?)\];/)?.[1] ?? '';
+    expect(appShellUrls).not.toMatch(/\b(?:BASE_PATH|INDEX_URL)\b/);
     expect(serviceWorker).toContain('`${BASE_PATH}manifest.webmanifest`');
     expect(serviceWorker).toContain('`${BASE_PATH}icons/icon-192.png`');
     expect(serviceWorker).toContain('`${BASE_PATH}icons/icon-512.png`');
