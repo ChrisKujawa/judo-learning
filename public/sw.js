@@ -2,6 +2,7 @@ const CACHE_VERSION = 'v1';
 const CACHE_NAME = `judo-learning-${CACHE_VERSION}`;
 const SCOPE_URL = new URL(self.registration.scope);
 const BASE_PATH = SCOPE_URL.pathname.endsWith('/') ? SCOPE_URL.pathname : `${SCOPE_URL.pathname}/`;
+const BASE_PATH_WITHOUT_TRAILING_SLASH = BASE_PATH.replace(/\/$/, '');
 const INDEX_URL = `${BASE_PATH}index.html`;
 const APP_SHELL_URLS = [
   `${BASE_PATH}manifest.webmanifest`,
@@ -42,7 +43,11 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin || !url.pathname.startsWith(BASE_PATH)) return;
+  const isAppPath =
+    url.pathname === BASE_PATH_WITHOUT_TRAILING_SLASH ||
+    url.pathname.startsWith(BASE_PATH);
+
+  if (url.origin !== self.location.origin || !isAppPath) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(request));
