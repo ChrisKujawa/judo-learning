@@ -18,11 +18,12 @@ describe('PWA assets', () => {
     expect(html).not.toContain('/vite.svg');
   });
 
-  it('uses the judo emoji for the app icon', () => {
+  it('uses a vector judogi for the app icon', () => {
     const icon = readFileSync(join(root, 'public', 'icons', 'icon.svg'), 'utf8');
 
-    expect(icon).toContain('🥋');
-    expect(icon).toContain('Noto Color Emoji');
+    expect(icon).not.toContain('<text');
+    expect(icon).toContain('fill="#14532d"');
+    expect(icon).toContain('fill="#facc15"');
   });
 
   it('defines an installable German manifest for the GitHub Pages scope', () => {

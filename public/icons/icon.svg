@@ -1,11 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Judo Lernen">
   <rect width="512" height="512" rx="112" fill="#16a34a"/>
-  <circle cx="256" cy="256" r="178" fill="#f9fafb"/>
-  <text
-    x="256"
-    y="314"
-    text-anchor="middle"
-    font-family="'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif"
-    font-size="220"
-  >🥋</text>
+  <circle cx="256" cy="132" r="56" fill="#f9fafb"/>
+  <path fill="#f9fafb" d="M142 210h228c28 0 50 22 50 50v124c0 18-14 32-32 32H124c-18 0-32-14-32-32V260c0-28 22-50 50-50Z"/>
+  <path fill="#16a34a" d="M152 246h76l28 52 28-52h76v42h-52l44 74h-52l-44-76-44 76h-52l44-74h-52z"/>
+  <path fill="#14532d" d="M136 376h240v40H136z"/>
+  <path fill="#facc15" d="M206 376h100v40H206z"/>
 </svg>
