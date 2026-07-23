@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { trackAnalyticsEvent } from './analytics';
 import { GradeSelector } from './components/GradeSelector';
 import { Quiz } from './components/Quiz';
 import { grades } from './data/grades';
@@ -23,6 +24,15 @@ export default function App() {
   const installPrompt = useInstallPrompt();
 
   function handleGradeSelect(grade: Grade) {
+    trackAnalyticsEvent({
+      path: `kyu-selected-${grade.id}`,
+      title: `Kyu selected: ${grade.name}`,
+    });
+    trackAnalyticsEvent({
+      path: `quiz-started-${grade.id}`,
+      title: `Quiz started: ${grade.name}`,
+    });
+
     const nextProgress = selectLatestGrade(progress, grade.id);
     setProgress(nextProgress);
     saveProgress(nextProgress);
@@ -34,6 +44,10 @@ export default function App() {
     const nextProgress = recordCompletedQuiz(progress, quiz);
     setProgress(nextProgress);
     saveProgress(nextProgress);
+    trackAnalyticsEvent({
+      path: `quiz-finished-${quiz.gradeId}`,
+      title: `Quiz finished: ${quiz.gradeName} (${Math.round((quiz.score / quiz.totalQuestions) * 100)}%)`,
+    });
   }
 
   function handleResetProgress() {
