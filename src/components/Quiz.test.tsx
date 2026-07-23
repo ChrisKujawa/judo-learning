@@ -13,8 +13,8 @@ vi.mock('../utils/quiz', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../utils/quiz')>();
   return {
     ...actual,
-    assignQuestionType: (t: Technique) =>
-      _forcedQuestionType !== null ? _forcedQuestionType : actual.assignQuestionType(t),
+    assignQuestionType: (...args: Parameters<typeof actual.assignQuestionType>) =>
+      _forcedQuestionType !== null ? _forcedQuestionType : actual.assignQuestionType(...args),
   };
 });
 
@@ -307,6 +307,10 @@ function makeImageGrade(): Grade {
 }
 
 describe('Quiz – image questions', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('shows 4 choices regardless of question type', () => {
     render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
     expect(within(screen.getByTestId('choices')).getAllByRole('button')).toHaveLength(4);
@@ -344,6 +348,42 @@ describe('Quiz – image questions', () => {
       unmount();
     }
     expect(found).toBe(true);
+  });
+
+  it('does not show image-required questions while offline', () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+
+    expect(screen.getByTestId('question-label')).toHaveTextContent('Was bedeutet…?');
+    expect(screen.queryByTestId('technique-image-before')).not.toBeInTheDocument();
+  });
+
+  it('does not show external technique images after answering while offline', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(screen.queryByTestId('technique-image-after')).not.toBeInTheDocument();
+  });
+
+  it('keeps the quiz question type stable when connectivity changes during a quiz', async () => {
+    const user = userEvent.setup();
+    const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    render(<Quiz grade={makeImageGrade()} onBack={vi.fn()} />);
+
+    expect(screen.getByTestId('question-label')).toHaveTextContent('Was bedeutet…?');
+
+    online.mockReturnValue(true);
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(screen.getByTestId('question-label')).toHaveTextContent('Was bedeutet…?');
+    expect(screen.queryByTestId('technique-image-before')).not.toBeInTheDocument();
   });
 });
 

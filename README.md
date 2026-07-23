@@ -18,7 +18,8 @@ The app UI and quiz content are in German. Japanese terms are used as prompts, a
 - **Cumulative technique pools:** higher grades include all techniques from earlier grades
 - **Immediate feedback** after each answer, including teaching hints
 - **Score summary** at the end of every quiz round with emoji feedback
-- Mobile-optimized layout, with installable PWA and offline support planned
+- Installable as a mobile PWA with app-owned icons and standalone launch
+- Offline-capable after the app has been opened once online
 
 ## Technique data
 
@@ -50,6 +51,15 @@ npm run dev
 
 The app then runs at `http://localhost:5173/judo-learning/`.
 
+### PWA and offline use
+
+The app includes a web app manifest, app-owned icons, and a service worker scoped to the deployed GitHub Pages path.
+
+- Supported mobile browsers show an in-app **App installieren** button when the browser exposes the install prompt.
+- After installation, the app launches in standalone mode.
+- The service worker caches the app shell, generated build assets, manifest, and icons. After the first online visit, the app shell can load offline.
+- Offline navigation falls back to the cached start page.
+
 ### Available commands
 
 | Command | Description |
@@ -70,13 +80,17 @@ The app then runs at `http://localhost:5173/judo-learning/`.
 src/
 ├── components/
 │   ├── GradeSelector.tsx   # Belt grade selection screen
+│   ├── InstallPrompt.tsx   # Install prompt for supported browsers
 │   └── Quiz.tsx            # Main quiz logic and score screen
 ├── data/
 │   ├── types.ts            # Shared Technique, Grade, and QuestionType types
 │   ├── techniques.ts       # Technique source data with DJB content
 │   └── grades.ts           # 8 grade objects with cumulative techniques
+├── hooks/
+│   └── useInstallPrompt.ts # Persistent install prompt state
 ├── utils/
 │   └── quiz.ts             # Pure quiz helpers: shuffle, choices, scoring, and question types
+├── pwa.ts                  # Service worker registration
 └── test/
     └── setup.ts            # Vitest and Testing Library setup
 ```
@@ -85,7 +99,7 @@ src/
 
 ## Tests
 
-Tests use Vitest and Testing Library:
+Vitest and Testing Library cover components, data integrity, progress tracking, and PWA behavior:
 
 ```bash
 npm test
@@ -94,8 +108,10 @@ npm test
 - `src/utils/quiz.test.ts`: pure quiz utility tests
 - `src/data/data.test.ts`: technique data integrity tests
 - `src/components/GradeSelector.test.tsx`
+- `src/components/InstallPrompt.test.tsx`
 - `src/components/Quiz.test.tsx`
 - `src/App.test.tsx`: integration tests
+- `src/pwa.test.ts` and `src/pwa-assets.test.ts`: service worker, manifest, and offline app shell tests
 
 ---
 

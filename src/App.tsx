@@ -3,6 +3,7 @@ import { GradeSelector } from './components/GradeSelector';
 import { Quiz } from './components/Quiz';
 import { grades } from './data/grades';
 import type { Grade } from './data/types';
+import { useInstallPrompt } from './hooks/useInstallPrompt';
 import {
   loadProgress,
   recordCompletedQuiz,
@@ -19,6 +20,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('grades');
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [progress, setProgress] = useState<ProgressStats>(() => loadProgress());
+  const installPrompt = useInstallPrompt();
 
   function handleGradeSelect(grade: Grade) {
     const nextProgress = selectLatestGrade(progress, grade.id);
@@ -53,6 +55,7 @@ export default function App() {
     <GradeSelector
       grades={grades}
       progress={progress}
+      installPrompt={installPrompt}
       onSelect={handleGradeSelect}
       onResetProgress={handleResetProgress}
     />

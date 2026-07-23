@@ -18,9 +18,13 @@ interface Question {
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
 export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
+  const [allowImageQuestions] = useState(() => navigator.onLine);
   const questions: Question[] = useMemo(
-    () => shuffle(grade.techniques).map((t) => ({ technique: t, type: assignQuestionType(t) })),
-    [grade.techniques]
+    () => shuffle(grade.techniques).map((t) => ({
+      technique: t,
+      type: assignQuestionType(t, { allowImageQuestions }),
+    })),
+    [allowImageQuestions, grade.techniques]
   );
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -52,7 +56,11 @@ export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
 
   // Show image before answering only for image-to-name; after answering for term-to-meaning
   const showImageBefore = questionType === 'image-to-name' && !!current.imageUrl;
-  const showImageAfter  = questionType === 'term-to-meaning' && !!current.imageUrl && answerState !== 'unanswered';
+  const showImageAfter =
+    allowImageQuestions &&
+    questionType === 'term-to-meaning' &&
+    !!current.imageUrl &&
+    answerState !== 'unanswered';
 
   const label =
     questionType === 'judo-wert' ? 'Judo-Wert erkennen' :
