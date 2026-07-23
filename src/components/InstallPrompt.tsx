@@ -8,7 +8,7 @@ export function InstallPrompt({ canInstall, onInstall }: InstallPromptControls) 
       className="w-full max-w-sm bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 text-left"
       data-testid="install-prompt"
     >
-      <h2 className="text-base font-bold text-green-900">Als App installieren</h2>
+      <h2 className="text-base font-bold text-green-900">🥋 Als App installieren</h2>
       <p className="text-sm text-green-800 mt-1 mb-3">
         Speichere Judo Lernen auf deinem Startbildschirm und übe schneller weiter.
       </p>

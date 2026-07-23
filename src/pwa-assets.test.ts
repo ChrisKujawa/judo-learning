@@ -8,10 +8,21 @@ describe('PWA assets', () => {
   it('links the manifest and app-owned icons from the HTML entry point', () => {
     const html = readFileSync(join(root, 'index.html'), 'utf8');
 
-    expect(html).toContain('rel="manifest" href="%BASE_URL%manifest.webmanifest"');
-    expect(html).toContain('rel="icon" type="image/svg+xml" href="%BASE_URL%icons/icon.svg"');
-    expect(html).toContain('rel="apple-touch-icon" href="%BASE_URL%icons/icon-192.png"');
+    expect(html).toContain('rel="manifest"');
+    expect(html).toContain('href="%BASE_URL%manifest.webmanifest"');
+    expect(html).toContain('rel="icon"');
+    expect(html).toContain('type="image/svg+xml"');
+    expect(html).toContain('href="%BASE_URL%icons/icon.svg"');
+    expect(html).toContain('rel="apple-touch-icon"');
+    expect(html).toContain('href="%BASE_URL%icons/icon-192.png"');
     expect(html).not.toContain('/vite.svg');
+  });
+
+  it('uses the judo emoji for the app icon', () => {
+    const icon = readFileSync(join(root, 'public', 'icons', 'icon.svg'), 'utf8');
+
+    expect(icon).toContain('🥋');
+    expect(icon).toContain('Noto Color Emoji');
   });
 
   it('defines an installable German manifest for the GitHub Pages scope', () => {
