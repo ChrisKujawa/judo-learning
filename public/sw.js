@@ -73,10 +73,24 @@ async function cacheIndexAndBuildAssets(cache, response) {
     .filter((url) => url.startsWith(BASE_PATH) && url.includes('/assets/'));
 
   if (assetUrls.length > 0) {
-    await cache.addAll([...new Set(assetUrls)]);
+    await Promise.all([...new Set(assetUrls)].map((assetUrl) => cacheBuildAsset(cache, assetUrl)));
   }
 
   await cache.put(INDEX_URL, indexResponse);
+}
+
+async function cacheBuildAsset(cache, assetUrl) {
+  try {
+    const response = await fetch(assetUrl);
+    if (!response.ok) {
+      console.warn(`Build-Asset konnte nicht zwischengespeichert werden: ${assetUrl}`);
+      return;
+    }
+
+    await cache.put(assetUrl, response);
+  } catch (error) {
+    console.warn(`Build-Asset konnte nicht zwischengespeichert werden: ${assetUrl}`, error);
+  }
 }
 
 async function networkFirstNavigation(request) {
