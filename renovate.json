@@ -19,20 +19,13 @@
       ],
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": false
-    },
-    {
-      "description": "Do not automerge major dependency updates",
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "automerge": false
+      "platformAutomerge": true
     }
   ],
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
     "automergeType": "pr",
-    "platformAutomerge": false
+    "platformAutomerge": true
   }
 }
