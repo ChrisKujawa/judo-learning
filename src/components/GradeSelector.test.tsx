@@ -137,4 +137,22 @@ describe('GradeSelector', () => {
 
     expect(screen.getByTestId('reset-progress-btn')).toBeDisabled();
   });
+
+  it('applies bgColor and textColor CSS classes to grade buttons', () => {
+    const grade = makeGrade({ bgColor: 'bg-yellow-400', textColor: 'text-yellow-900' });
+    render(<GradeSelector grades={[grade]} onSelect={vi.fn()} />);
+    const btn = screen.getByTestId('grade-btn-kyu7');
+    expect(btn).toHaveClass('bg-yellow-400');
+    expect(btn).toHaveClass('text-yellow-900');
+  });
+
+  it('applies correct CSS classes to all real grade buttons', async () => {
+    const { grades } = await import('../data/grades');
+    render(<GradeSelector grades={grades} onSelect={vi.fn()} />);
+    for (const grade of grades) {
+      const btn = screen.getByTestId(`grade-btn-${grade.id}`);
+      expect(btn).toHaveClass(grade.bgColor);
+      expect(btn).toHaveClass(grade.textColor);
+    }
+  });
 });
