@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { GradeSelector } from '../components/GradeSelector';
 import type { Grade } from '../data/types';
 import { createEmptyProgress, type ProgressStats } from '../utils/progress';
+import { grades as allGrades } from '../data/grades';
 
 function makeGrade(overrides: Partial<Grade> = {}): Grade {
   return {
@@ -79,9 +80,8 @@ describe('GradeSelector', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('renders all 8 real grades without crashing', async () => {
-    const { grades } = await import('../data/grades');
-    render(<GradeSelector grades={grades} onSelect={vi.fn()} />);
+  it('renders all 8 real grades without crashing', () => {
+    render(<GradeSelector grades={allGrades} onSelect={vi.fn()} />);
     expect(screen.getAllByRole('button')).toHaveLength(8);
   });
 
@@ -136,5 +136,22 @@ describe('GradeSelector', () => {
     render(<GradeSelector grades={[makeGrade()]} progress={makeProgress()} onSelect={vi.fn()} />);
 
     expect(screen.getByTestId('reset-progress-btn')).toBeDisabled();
+  });
+
+  it('applies bgColor and textColor CSS classes to grade buttons', () => {
+    const grade = makeGrade({ bgColor: 'bg-yellow-400', textColor: 'text-yellow-900' });
+    render(<GradeSelector grades={[grade]} onSelect={vi.fn()} />);
+    const btn = screen.getByTestId('grade-btn-kyu7');
+    expect(btn).toHaveClass('bg-yellow-400');
+    expect(btn).toHaveClass('text-yellow-900');
+  });
+
+  it('applies correct CSS classes to all real grade buttons', () => {
+    render(<GradeSelector grades={allGrades} onSelect={vi.fn()} />);
+    for (const grade of allGrades) {
+      const btn = screen.getByTestId(`grade-btn-${grade.id}`);
+      expect(btn).toHaveClass(grade.bgColor);
+      expect(btn).toHaveClass(grade.textColor);
+    }
   });
 });
