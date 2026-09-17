@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { trackAnalyticsEvent } from './analytics';
 import { GradeSelector } from './components/GradeSelector';
+import { Glossary } from './components/Glossary';
 import { Quiz } from './components/Quiz';
 import { grades } from './data/grades';
+import { ALL_TECHNIQUES } from './data/techniques';
 import type { Grade } from './data/types';
 import { useInstallPrompt } from './hooks/useInstallPrompt';
 import {
@@ -15,7 +17,7 @@ import {
   type ProgressStats,
 } from './utils/progress';
 
-type Screen = 'grades' | 'quiz';
+type Screen = 'grades' | 'glossary' | 'quiz';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('grades');
@@ -65,12 +67,17 @@ export default function App() {
     );
   }
 
+  if (screen === 'glossary') {
+    return <Glossary techniques={ALL_TECHNIQUES} onBack={() => setScreen('grades')} />;
+  }
+
   return (
     <GradeSelector
       grades={grades}
       progress={progress}
       installPrompt={installPrompt}
       onSelect={handleGradeSelect}
+      onOpenGlossary={() => setScreen('glossary')}
       onResetProgress={handleResetProgress}
     />
   );
