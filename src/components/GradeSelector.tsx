@@ -8,6 +8,7 @@ interface GradeSelectorProps {
   progress?: ProgressStats;
   installPrompt?: InstallPromptControls;
   onSelect: (grade: Grade) => void;
+  onOpenGlossary?: () => void;
   onResetProgress?: () => void;
 }
 
@@ -16,6 +17,7 @@ export function GradeSelector({
   progress,
   installPrompt,
   onSelect,
+  onOpenGlossary,
   onResetProgress,
 }: GradeSelectorProps) {
   const hasProgress = progress
@@ -36,6 +38,25 @@ export function GradeSelector({
       </div>
 
       {installPrompt && <InstallPrompt {...installPrompt} />}
+
+      {onOpenGlossary && (
+        <button
+          type="button"
+          onClick={onOpenGlossary}
+          className="mb-6 flex w-full max-w-sm items-center gap-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 text-left shadow-sm active:scale-95 transition-transform"
+          data-testid="open-glossary-btn"
+        >
+          <span className="text-3xl" aria-hidden="true">
+            📖
+          </span>
+          <span>
+            <span className="block font-bold text-gray-900">Judo-Lexikon</span>
+            <span className="mt-0.5 block text-sm text-gray-600">
+              Alle Begriffe und Techniken nachschlagen
+            </span>
+          </span>
+        </button>
+      )}
 
       {progress && (
         <section

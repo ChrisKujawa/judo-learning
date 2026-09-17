@@ -33,6 +33,18 @@ describe('App – integration', () => {
     expect(screen.getByTestId('question')).toBeInTheDocument();
   });
 
+  it('navigates to the glossary and back to the home screen', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('open-glossary-btn'));
+    expect(screen.getByRole('heading', { level: 1, name: 'Judo-Lexikon' })).toBeInTheDocument();
+    expect(screen.getByTestId('glossary-entry-o-goshi')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+    expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
+  });
+
   it('shows progress counter after grade selection', async () => {
     const user = userEvent.setup();
     render(<App />);
