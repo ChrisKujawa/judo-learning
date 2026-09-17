@@ -12,6 +12,16 @@
   "rebaseWhen": "behind-base-branch",
   "packageRules": [
     {
+      "description": "Group Vite and Vitest ecosystem updates",
+      "matchPackageNames": [
+        "vite",
+        "@vitejs/plugin-react",
+        "vitest",
+        "@vitest/**"
+      ],
+      "groupName": "Vite ecosystem"
+    },
+    {
       "description": "Automerge npm and GitHub Actions updates after checks pass",
       "matchManagers": [
         "npm",

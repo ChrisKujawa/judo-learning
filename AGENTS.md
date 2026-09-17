@@ -16,14 +16,14 @@ A mobile-friendly quiz app for learning Judo theory (Japanese terms, technique n
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | React 18 |
-| Build | Vite 5 |
+| Framework | React 19 |
+| Build | Vite 8 |
 | Language | TypeScript 5 |
-| Styling | Tailwind CSS 3 |
-| Testing | Vitest 1 + Testing Library |
+| Styling | Tailwind CSS 4 |
+| Testing | Vitest 5 + Testing Library |
 | Hosting | GitHub Pages (via Actions) |
 
-> **Node constraint:** The project runs on Node 18. Do NOT upgrade to Vitest 2 (requires Node 20+) or use jsdom (ESM conflict on Node 18 — use `happy-dom` instead).
+> **Node constraint:** The project requires Node 22.12 or newer. GitHub Actions uses Node 24.
 
 ---
 
@@ -137,10 +137,10 @@ No other files need updating — `grades.ts` picks up new techniques automatical
 
 | Workflow | Trigger | Steps |
 |----------|---------|-------|
-| `ci.yml` | push / PR to main | checkout → setup Node 20 → `npm ci` → `npm test` |
-| `deploy.yml` | push to main | checkout → setup Node 20 → `npm ci` → `npm test` → `npm run build` → deploy to Pages |
+| `ci.yml` | push / PR to main | checkout → setup Node 24 → `npm ci` → `npm test` |
+| `deploy.yml` | push to main | checkout → setup Node 24 → `npm ci` → `npm test` → `npm run build` → deploy to Pages |
 
-Both workflows use Node 20 in GitHub Actions (even though local dev targets Node 18 — GH Actions LTS).
+Both workflows use Node 24 in GitHub Actions.
 
 ---
 
