@@ -38,7 +38,7 @@ The content is based on the official DJB graduation system:
 
 ### Requirements
 
-- Node.js 18+
+- Node.js 22.12+
 - npm
 
 ### Setup
