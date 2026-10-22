@@ -3,8 +3,8 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { trackAnalyticsEvent } from './analytics';
 import App from './App';
-import { grades } from './data/grades';
 import { PROGRESS_STORAGE_KEY, createEmptyProgress } from './utils/progress';
+import { QUIZ_QUESTION_LIMIT } from './utils/quiz';
 
 vi.mock('./analytics', () => ({
   trackAnalyticsEvent: vi.fn(),
@@ -144,7 +144,6 @@ describe('App – integration', () => {
 
   it('persists completed quiz stats locally', async () => {
     const user = userEvent.setup();
-    const kyu8QuestionCount = grades.find((grade) => grade.id === 'kyu8')?.techniques.length;
     render(<App />);
 
     await user.click(screen.getByTestId('grade-btn-kyu8'));
@@ -155,16 +154,37 @@ describe('App – integration', () => {
 
     expect(JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? '{}')).toMatchObject({
       totalQuizzesCompleted: 1,
-      totalAnswers: kyu8QuestionCount,
-      totalCorrectAnswers: kyu8QuestionCount,
+      totalAnswers: QUIZ_QUESTION_LIMIT,
+      totalCorrectAnswers: QUIZ_QUESTION_LIMIT,
       bestScorePercentage: 100,
       latestSelectedGradeId: 'kyu8',
       grades: {
         kyu8: {
           quizzesCompleted: 1,
-          totalAnswers: kyu8QuestionCount,
-          totalCorrectAnswers: kyu8QuestionCount,
+          totalAnswers: QUIZ_QUESTION_LIMIT,
+          totalCorrectAnswers: QUIZ_QUESTION_LIMIT,
           bestScorePercentage: 100,
+        },
+      },
+    });
+  });
+
+  it('persists an answer before the quiz is completed', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? '{}')).toMatchObject({
+      totalQuizzesCompleted: 0,
+      totalAnswers: 1,
+      totalCorrectAnswers: 1,
+      grades: {
+        kyu8: {
+          quizzesCompleted: 0,
+          totalAnswers: 1,
+          totalCorrectAnswers: 1,
         },
       },
     });

@@ -1,5 +1,16 @@
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { shuffle, assignQuestionType, buildChoices, buildWertChoices, WERTE_DISTRACTORS, scoreEmoji, scoreColor } from '../utils/quiz';
+import {
+  QUIZ_QUESTION_LIMIT,
+  assignQuestionType,
+  buildChoices,
+  buildWertChoices,
+  questionSelectionWeight,
+  scoreColor,
+  scoreEmoji,
+  selectQuizTechniques,
+  shuffle,
+  WERTE_DISTRACTORS,
+} from '../utils/quiz';
 import type { Technique } from '../data/types';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -60,6 +71,40 @@ describe('shuffle', () => {
     );
     // Probability of always same order is (1/8!)^29 ≈ 0
     expect(serialized.size).toBeGreaterThan(1);
+  });
+});
+
+describe('adaptive quiz selection', () => {
+  it('gives unseen techniques the highest selection weight', () => {
+    expect(questionSelectionWeight()).toBe(6);
+    expect(questionSelectionWeight({ correctAnswers: 0, wrongAnswers: 2 })).toBe(5);
+    expect(questionSelectionWeight({ correctAnswers: 1, wrongAnswers: 1 })).toBe(3);
+    expect(questionSelectionWeight({ correctAnswers: 2, wrongAnswers: 0 })).toBe(1);
+  });
+
+  it('limits a quiz to unique techniques', () => {
+    const selected = selectQuizTechniques(makePool(30), {}, QUIZ_QUESTION_LIMIT, () => 0.5);
+
+    expect(selected).toHaveLength(QUIZ_QUESTION_LIMIT);
+    expect(new Set(selected.map((technique) => technique.id))).toHaveLength(QUIZ_QUESTION_LIMIT);
+  });
+
+  it('keeps all techniques when the grade has fewer than the limit', () => {
+    const pool = makePool(5);
+
+    expect(selectQuizTechniques(pool)).toHaveLength(pool.length);
+  });
+
+  it('uses progress weights when selecting the next technique', () => {
+    const pool = makePool(2);
+    const selected = selectQuizTechniques(
+      pool,
+      { t0: { correctAnswers: 2, wrongAnswers: 0 } },
+      1,
+      () => 0.2
+    );
+
+    expect(selected[0].id).toBe('t1');
   });
 });
 

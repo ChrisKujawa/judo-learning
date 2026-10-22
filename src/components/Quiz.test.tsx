@@ -84,6 +84,11 @@ describe('Quiz – rendering', () => {
     expect(screen.getByTestId('progress').textContent).toMatch(/^1 \/ 5/);
   });
 
+  it('limits longer grades to 20 questions', () => {
+    render(<Quiz grade={makeGrade(25)} onBack={vi.fn()} />);
+    expect(screen.getByTestId('progress')).toHaveTextContent('1 / 20');
+  });
+
   it('shows initial score of 0', () => {
     render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     expect(screen.getByTestId('score').textContent).toContain('0');
@@ -110,6 +115,17 @@ describe('Quiz – answering', () => {
     render(<Quiz grade={makeGrade()} onBack={vi.fn()} />);
     await user.click(screen.getAllByTestId('choice-correct')[0]);
     expect(screen.getByTestId('score').textContent).toContain('1');
+  });
+
+  it('reports each answer immediately', async () => {
+    const user = userEvent.setup();
+    const onAnswer = vi.fn();
+    render(<Quiz grade={makeGrade()} onBack={vi.fn()} onAnswer={onAnswer} />);
+
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(onAnswer).toHaveBeenCalledOnce();
+    expect(onAnswer).toHaveBeenCalledWith(expect.objectContaining({ correct: true }));
   });
 
   it('does not increment score when wrong answer is selected', async () => {

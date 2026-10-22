@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react';
 import type { Grade, Technique, QuestionType } from '../data/types';
-import { shuffle, assignQuestionType, buildChoices, buildWertChoices, scoreEmoji, scoreColor } from '../utils/quiz';
+import { assignQuestionType, buildChoices, buildWertChoices, scoreEmoji, scoreColor, selectQuizTechniques } from '../utils/quiz';
 import { calculateAccuracy, type CompletedQuiz, type CompletedQuizAnswer, type ProgressStats } from '../utils/progress';
 
 interface QuizProps {
   grade: Grade;
   progress?: ProgressStats;
   onBack: () => void;
+  onAnswer?: (answer: CompletedQuizAnswer) => void;
   onComplete?: (quiz: CompletedQuiz) => void;
 }
 
@@ -17,14 +18,13 @@ interface Question {
 
 type AnswerState = 'unanswered' | 'correct' | 'wrong';
 
-export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
+export function Quiz({ grade, progress, onBack, onAnswer, onComplete }: QuizProps) {
   const [allowImageQuestions] = useState(() => navigator.onLine);
-  const questions: Question[] = useMemo(
-    () => shuffle(grade.techniques).map((t) => ({
+  const [questions] = useState<Question[]>(() =>
+    selectQuizTechniques(grade.techniques, progress?.techniques).map((t) => ({
       technique: t,
       type: assignQuestionType(t, { allowImageQuestions }),
-    })),
-    [allowImageQuestions, grade.techniques]
+    }))
   );
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -76,6 +76,7 @@ export function Quiz({ grade, progress, onBack, onComplete }: QuizProps) {
       ...currentAnswers,
       { techniqueId: current.id, correct: isCorrect },
     ]);
+    onAnswer?.({ techniqueId: current.id, correct: isCorrect });
 
     if (isCorrect) {
       setAnswerState('correct');

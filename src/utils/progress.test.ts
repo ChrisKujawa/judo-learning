@@ -6,6 +6,7 @@ import {
   loadProgress,
   normalizeProgress,
   recordCompletedQuiz,
+  recordQuizAnswer,
   resetProgress,
   saveProgress,
   selectLatestGrade,
@@ -234,8 +235,32 @@ describe('progress aggregation', () => {
     expect(progress.totalQuizzesCompleted).toBe(0);
   });
 
-  it('aggregates completed quiz totals, grade stats, and technique stats', () => {
-    const progress = recordCompletedQuiz(createEmptyProgress(), makeCompletedQuiz());
+  it('records each answer immediately without completing a quiz', () => {
+    const progress = recordQuizAnswer(createEmptyProgress(), {
+      gradeId: 'kyu7',
+      techniqueId: 'o-goshi',
+      correct: true,
+    });
+
+    expect(progress.totalQuizzesCompleted).toBe(0);
+    expect(progress.totalAnswers).toBe(1);
+    expect(progress.totalCorrectAnswers).toBe(1);
+    expect(progress.grades.kyu7).toEqual({
+      quizzesCompleted: 0,
+      totalAnswers: 1,
+      totalCorrectAnswers: 1,
+      bestScorePercentage: 0,
+    });
+    expect(progress.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
+  });
+
+  it('records quiz completion without counting its answers twice', () => {
+    const quiz = makeCompletedQuiz();
+    const withAnswers = quiz.answers.reduce(
+      (progress, answer) => recordQuizAnswer(progress, { ...answer, gradeId: quiz.gradeId }),
+      createEmptyProgress()
+    );
+    const progress = recordCompletedQuiz(withAnswers, quiz);
 
     expect(progress.totalQuizzesCompleted).toBe(1);
     expect(progress.totalAnswers).toBe(3);
@@ -247,7 +272,6 @@ describe('progress aggregation', () => {
       totalCorrectAnswers: 2,
       bestScorePercentage: 67,
     });
-    expect(progress.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
     expect(progress.techniques['tai-otoshi']).toEqual({ correctAnswers: 0, wrongAnswers: 1 });
     expect(progress.latestCompletedQuiz).toEqual({
       gradeId: 'kyu7',
@@ -266,7 +290,7 @@ describe('progress aggregation', () => {
     expect(second.bestScorePercentage).toBe(100);
     expect(second.grades.kyu7.bestScorePercentage).toBe(100);
     expect(second.totalQuizzesCompleted).toBe(2);
-    expect(second.totalCorrectAnswers).toBe(4);
+    expect(second.totalCorrectAnswers).toBe(0);
   });
 
   it('calculates accuracy from total answers', () => {

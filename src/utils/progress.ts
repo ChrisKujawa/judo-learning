@@ -39,6 +39,10 @@ export interface CompletedQuizAnswer {
   correct: boolean;
 }
 
+export interface QuizAnswer extends CompletedQuizAnswer {
+  gradeId: string;
+}
+
 export interface CompletedQuiz {
   gradeId: string;
   gradeName: string;
@@ -117,29 +121,45 @@ export function selectLatestGrade(progress: ProgressStats, gradeId: string): Pro
   };
 }
 
+export function recordQuizAnswer(progress: ProgressStats, answer: QuizAnswer): ProgressStats {
+  const current = normalizeProgress(progress);
+  if (!answer.techniqueId) return current;
+
+  const gradeStats = current.grades[answer.gradeId] ?? createEmptyGradeProgress();
+  const technique = current.techniques[answer.techniqueId] ?? createEmptyTechniqueProgress();
+
+  return {
+    ...current,
+    totalAnswers: current.totalAnswers + 1,
+    totalCorrectAnswers: current.totalCorrectAnswers + (answer.correct ? 1 : 0),
+    grades: {
+      ...current.grades,
+      [answer.gradeId]: {
+        ...gradeStats,
+        totalAnswers: gradeStats.totalAnswers + 1,
+        totalCorrectAnswers: gradeStats.totalCorrectAnswers + (answer.correct ? 1 : 0),
+      },
+    },
+    techniques: {
+      ...current.techniques,
+      [answer.techniqueId]: {
+        correctAnswers: technique.correctAnswers + (answer.correct ? 1 : 0),
+        wrongAnswers: technique.wrongAnswers + (answer.correct ? 0 : 1),
+      },
+    },
+  };
+}
+
 export function recordCompletedQuiz(progress: ProgressStats, quiz: CompletedQuiz): ProgressStats {
   const current = normalizeProgress(progress);
   const totalQuestions = normalizeCount(quiz.totalQuestions);
   const score = Math.min(normalizeCount(quiz.score), totalQuestions);
   const percentage = calculatePercentage(score, totalQuestions);
   const gradeStats = current.grades[quiz.gradeId] ?? createEmptyGradeProgress();
-  const nextTechniques = { ...current.techniques };
-
-  quiz.answers.forEach((answer) => {
-    if (!answer.techniqueId) return;
-
-    const technique = nextTechniques[answer.techniqueId] ?? createEmptyTechniqueProgress();
-    nextTechniques[answer.techniqueId] = {
-      correctAnswers: technique.correctAnswers + (answer.correct ? 1 : 0),
-      wrongAnswers: technique.wrongAnswers + (answer.correct ? 0 : 1),
-    };
-  });
 
   return {
     ...current,
     totalQuizzesCompleted: current.totalQuizzesCompleted + 1,
-    totalAnswers: current.totalAnswers + totalQuestions,
-    totalCorrectAnswers: current.totalCorrectAnswers + score,
     bestScorePercentage: Math.max(current.bestScorePercentage, percentage),
     latestCompletedQuiz: {
       gradeId: quiz.gradeId,
@@ -152,13 +172,11 @@ export function recordCompletedQuiz(progress: ProgressStats, quiz: CompletedQuiz
     grades: {
       ...current.grades,
       [quiz.gradeId]: {
+        ...gradeStats,
         quizzesCompleted: gradeStats.quizzesCompleted + 1,
-        totalAnswers: gradeStats.totalAnswers + totalQuestions,
-        totalCorrectAnswers: gradeStats.totalCorrectAnswers + score,
         bestScorePercentage: Math.max(gradeStats.bestScorePercentage, percentage),
       },
     },
-    techniques: nextTechniques,
   };
 }
 
