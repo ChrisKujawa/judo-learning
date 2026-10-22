@@ -141,7 +141,7 @@ No other files need updating — `grades.ts` picks up new techniques automatical
 
 | Workflow | Trigger | Steps |
 |----------|---------|-------|
-| `ci.yml` | push / PR to main | checkout → setup Node 24 → `npm ci` → `npm test` |
+| `ci.yml` | push / PR to main | checkout → setup Node 24 → `npm ci` → `npm run test:coverage` → `npm run build` |
 | `deploy.yml` | push to main | checkout → setup Node 24 → `npm ci` → `npm test` → `npm run build` → deploy to Pages |
 
 Both workflows use Node 24 in GitHub Actions.
