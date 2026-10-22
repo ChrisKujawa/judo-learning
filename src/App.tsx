@@ -10,10 +10,12 @@ import { useInstallPrompt } from './hooks/useInstallPrompt';
 import {
   loadProgress,
   recordCompletedQuiz,
+  recordQuizAnswer,
   resetProgress,
   saveProgress,
   selectLatestGrade,
   type CompletedQuiz,
+  type CompletedQuizAnswer,
   type ProgressStats,
 } from './utils/progress';
 
@@ -43,12 +45,25 @@ export default function App() {
   }
 
   function handleQuizComplete(quiz: CompletedQuiz) {
-    const nextProgress = recordCompletedQuiz(progress, quiz);
-    setProgress(nextProgress);
-    saveProgress(nextProgress);
+    setProgress((currentProgress) => {
+      const nextProgress = recordCompletedQuiz(currentProgress, quiz);
+      saveProgress(nextProgress);
+      return nextProgress;
+    });
     trackAnalyticsEvent({
       path: `quiz-finished-${quiz.gradeId}`,
       title: `Quiz finished: ${quiz.gradeName} (${Math.round((quiz.score / quiz.totalQuestions) * 100)}%)`,
+    });
+  }
+
+  function handleQuizAnswer(gradeId: string, answer: CompletedQuizAnswer) {
+    setProgress((currentProgress) => {
+      const nextProgress = recordQuizAnswer(currentProgress, {
+        ...answer,
+        gradeId,
+      });
+      saveProgress(nextProgress);
+      return nextProgress;
     });
   }
 
@@ -62,6 +77,7 @@ export default function App() {
         grade={selectedGrade}
         progress={progress}
         onBack={() => setScreen('grades')}
+        onAnswer={(answer) => handleQuizAnswer(selectedGrade.id, answer)}
         onComplete={handleQuizComplete}
       />
     );

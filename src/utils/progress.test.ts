@@ -6,6 +6,7 @@ import {
   loadProgress,
   normalizeProgress,
   recordCompletedQuiz,
+  recordQuizAnswer,
   resetProgress,
   saveProgress,
   selectLatestGrade,
@@ -92,6 +93,20 @@ describe('progress storage helpers', () => {
     expect(normalized.grades.broken).toBeUndefined();
     expect(normalized.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
     expect(normalized.techniques.invalid).toBeUndefined();
+  });
+
+  it('normalizes non-object progress to an empty model', () => {
+    expect(normalizeProgress(null)).toEqual(createEmptyProgress());
+  });
+
+  it('drops an incomplete latest quiz', () => {
+    expect(normalizeProgress({
+      latestCompletedQuiz: {
+        gradeId: 'kyu7',
+        gradeName: '',
+        completedAt: '2026-07-22T19:00:00.000Z',
+      },
+    }).latestCompletedQuiz).toBeNull();
   });
 
   it('ignores unsafe storage keys while normalizing nested stats', () => {
@@ -234,9 +249,47 @@ describe('progress aggregation', () => {
     expect(progress.totalQuizzesCompleted).toBe(0);
   });
 
-  it('aggregates completed quiz totals, grade stats, and technique stats', () => {
-    const progress = recordCompletedQuiz(createEmptyProgress(), makeCompletedQuiz());
+  it('records each answer immediately without completing a quiz', () => {
+    const progress = recordQuizAnswer(createEmptyProgress(), {
+      gradeId: 'kyu7',
+      techniqueId: 'o-goshi',
+      correct: true,
+    });
 
+    expect(progress.totalQuizzesCompleted).toBe(0);
+    expect(progress.totalAnswers).toBe(1);
+    expect(progress.totalCorrectAnswers).toBe(1);
+    expect(progress.grades.kyu7).toEqual({
+      quizzesCompleted: 0,
+      totalAnswers: 1,
+      totalCorrectAnswers: 1,
+      bestScorePercentage: 0,
+    });
+    expect(progress.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
+  });
+
+  it('ignores answers without a technique', () => {
+    const empty = createEmptyProgress();
+
+    expect(recordQuizAnswer(empty, {
+      gradeId: 'kyu7',
+      techniqueId: '',
+      correct: true,
+    })).toEqual(empty);
+  });
+
+  it('records quiz completion without counting its answers twice', () => {
+    // Given
+    const quiz = makeCompletedQuiz();
+    const withAnswers = quiz.answers.reduce(
+      (progress, answer) => recordQuizAnswer(progress, { ...answer, gradeId: quiz.gradeId }),
+      createEmptyProgress()
+    );
+
+    // When
+    const progress = recordCompletedQuiz(withAnswers, quiz);
+
+    // Then
     expect(progress.totalQuizzesCompleted).toBe(1);
     expect(progress.totalAnswers).toBe(3);
     expect(progress.totalCorrectAnswers).toBe(2);
@@ -247,7 +300,6 @@ describe('progress aggregation', () => {
       totalCorrectAnswers: 2,
       bestScorePercentage: 67,
     });
-    expect(progress.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
     expect(progress.techniques['tai-otoshi']).toEqual({ correctAnswers: 0, wrongAnswers: 1 });
     expect(progress.latestCompletedQuiz).toEqual({
       gradeId: 'kyu7',
@@ -266,7 +318,7 @@ describe('progress aggregation', () => {
     expect(second.bestScorePercentage).toBe(100);
     expect(second.grades.kyu7.bestScorePercentage).toBe(100);
     expect(second.totalQuizzesCompleted).toBe(2);
-    expect(second.totalCorrectAnswers).toBe(4);
+    expect(second.totalCorrectAnswers).toBe(0);
   });
 
   it('calculates accuracy from total answers', () => {

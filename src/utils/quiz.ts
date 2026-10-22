@@ -1,7 +1,14 @@
 import type { Technique, QuestionType } from '../data/types';
 
+export const QUIZ_QUESTION_LIMIT = 20;
+
 interface AssignQuestionTypeOptions {
   allowImageQuestions?: boolean;
+}
+
+interface QuestionProgress {
+  correctAnswers: number;
+  wrongAnswers: number;
 }
 
 export function shuffle<T>(arr: T[]): T[] {
@@ -11,6 +18,45 @@ export function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+export function questionSelectionWeight(progress?: QuestionProgress): number {
+  if (!progress || progress.correctAnswers + progress.wrongAnswers === 0) return 6;
+
+  const attempts = progress.correctAnswers + progress.wrongAnswers;
+  return 1 + 4 * (progress.wrongAnswers / attempts);
+}
+
+export function selectQuizTechniques(
+  techniques: Technique[],
+  progress: Record<string, QuestionProgress> = {},
+  limit = QUIZ_QUESTION_LIMIT,
+  random = Math.random
+): Technique[] {
+  const candidates = techniques.map((technique) => ({
+    technique,
+    weight: questionSelectionWeight(progress[technique.id]),
+  }));
+  const selected: Technique[] = [];
+
+  while (candidates.length > 0 && selected.length < limit) {
+    const totalWeight = candidates.reduce((sum, candidate) => sum + candidate.weight, 0);
+    let target = random() * totalWeight;
+    let selectedIndex = candidates.length - 1;
+
+    for (let index = 0; index < candidates.length; index++) {
+      target -= candidates[index].weight;
+      if (target < 0) {
+        selectedIndex = index;
+        break;
+      }
+    }
+
+    selected.push(candidates[selectedIndex].technique);
+    candidates.splice(selectedIndex, 1);
+  }
+
+  return selected;
 }
 
 /**
