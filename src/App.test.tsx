@@ -190,6 +190,34 @@ describe('App – integration', () => {
     });
   });
 
+  it('continues the quiz when local progress cannot be persisted', async () => {
+    const user = userEvent.setup();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(<App />);
+    const originalStorage = window.localStorage;
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: {
+        setItem() {
+          throw new Error('Storage blocked');
+        },
+      },
+    });
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+
+    expect(screen.getByTestId('score')).toHaveTextContent('1');
+    expect(warn).toHaveBeenCalledWith(
+      'Lernfortschritt konnte nicht gespeichert werden.',
+      expect.any(Error)
+    );
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: originalStorage,
+    });
+  });
+
   it('tracks completed quizzes with the Kyu grade and score percentage', async () => {
     const user = userEvent.setup();
     render(<App />);

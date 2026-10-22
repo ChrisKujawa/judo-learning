@@ -27,6 +27,11 @@ function InstallPromptHarness() {
   return <InstallPrompt {...installPrompt} />;
 }
 
+function InstallPromptHookHarness() {
+  const { onInstall } = useInstallPrompt();
+  return <button onClick={onInstall}>Installieren</button>;
+}
+
 describe('InstallPrompt', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -37,6 +42,13 @@ describe('InstallPrompt', () => {
     render(<InstallPrompt canInstall={false} onInstall={vi.fn()} />);
 
     expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
+  });
+
+  it('ignores install requests before the browser exposes a prompt', async () => {
+    const user = userEvent.setup();
+    render(<InstallPromptHookHarness />);
+
+    await expect(user.click(screen.getByRole('button', { name: 'Installieren' }))).resolves.toBeUndefined();
   });
 
   it('renders safely when matchMedia is unavailable', () => {
@@ -84,5 +96,16 @@ describe('InstallPrompt', () => {
         expect.any(Error)
       );
     });
+  });
+
+  it('hides the prompt after the app is installed', async () => {
+    render(<InstallPromptHarness />);
+    await dispatchBeforeInstallPrompt();
+
+    await act(async () => {
+      window.dispatchEvent(new Event('appinstalled'));
+    });
+
+    expect(screen.queryByTestId('install-prompt')).not.toBeInTheDocument();
   });
 });

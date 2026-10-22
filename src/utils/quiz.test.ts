@@ -95,6 +95,14 @@ describe('adaptive quiz selection', () => {
     expect(selectQuizTechniques(pool)).toHaveLength(pool.length);
   });
 
+  it('handles an empty technique pool', () => {
+    expect(selectQuizTechniques([])).toEqual([]);
+  });
+
+  it('handles a zero question limit', () => {
+    expect(selectQuizTechniques(makePool(5), {}, 0)).toEqual([]);
+  });
+
   it('uses progress weights when selecting the next technique', () => {
     const pool = makePool(2);
     const selected = selectQuizTechniques(

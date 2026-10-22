@@ -14,6 +14,13 @@ describe('PWA service worker registration', () => {
     });
   });
 
+  it('normalizes a base path without a trailing slash', () => {
+    expect(createServiceWorkerRegistrationConfig('/judo-learning')).toEqual({
+      scriptUrl: '/judo-learning/sw.js',
+      scope: '/judo-learning/',
+    });
+  });
+
   it('registers the service worker after the page has loaded', () => {
     const register = vi.fn().mockResolvedValue(undefined);
     vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading');
@@ -56,5 +63,30 @@ describe('PWA service worker registration', () => {
     window.dispatchEvent(new Event('load'));
 
     expect(register).not.toHaveBeenCalled();
+  });
+
+  it('does not register when service workers are unavailable', () => {
+    vi.stubGlobal('navigator', {});
+
+    expect(() => registerServiceWorker({ enabled: true })).not.toThrow();
+  });
+
+  it('reports service worker registration failures', async () => {
+    const error = new Error('Registration failed');
+    const register = vi.fn().mockRejectedValue(error);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(document, 'readyState', 'get').mockReturnValue('complete');
+    vi.stubGlobal('navigator', {
+      serviceWorker: { register },
+    });
+
+    registerServiceWorker({ baseUrl: '/judo-learning/', enabled: true });
+
+    await vi.waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        'Service Worker konnte nicht registriert werden.',
+        error
+      );
+    });
   });
 });

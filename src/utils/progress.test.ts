@@ -95,6 +95,20 @@ describe('progress storage helpers', () => {
     expect(normalized.techniques.invalid).toBeUndefined();
   });
 
+  it('normalizes non-object progress to an empty model', () => {
+    expect(normalizeProgress(null)).toEqual(createEmptyProgress());
+  });
+
+  it('drops an incomplete latest quiz', () => {
+    expect(normalizeProgress({
+      latestCompletedQuiz: {
+        gradeId: 'kyu7',
+        gradeName: '',
+        completedAt: '2026-07-22T19:00:00.000Z',
+      },
+    }).latestCompletedQuiz).toBeNull();
+  });
+
   it('ignores unsafe storage keys while normalizing nested stats', () => {
     const normalized = normalizeProgress({
       grades: {
@@ -252,6 +266,16 @@ describe('progress aggregation', () => {
       bestScorePercentage: 0,
     });
     expect(progress.techniques['o-goshi']).toEqual({ correctAnswers: 1, wrongAnswers: 0 });
+  });
+
+  it('ignores answers without a technique', () => {
+    const empty = createEmptyProgress();
+
+    expect(recordQuizAnswer(empty, {
+      gradeId: 'kyu7',
+      techniqueId: '',
+      correct: true,
+    })).toEqual(empty);
   });
 
   it('records quiz completion without counting its answers twice', () => {

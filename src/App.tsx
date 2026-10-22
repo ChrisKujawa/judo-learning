@@ -56,13 +56,11 @@ export default function App() {
     });
   }
 
-  function handleQuizAnswer(answer: CompletedQuizAnswer) {
-    if (!selectedGrade) return;
-
+  function handleQuizAnswer(gradeId: string, answer: CompletedQuizAnswer) {
     setProgress((currentProgress) => {
       const nextProgress = recordQuizAnswer(currentProgress, {
         ...answer,
-        gradeId: selectedGrade.id,
+        gradeId,
       });
       saveProgress(nextProgress);
       return nextProgress;
@@ -79,7 +77,7 @@ export default function App() {
         grade={selectedGrade}
         progress={progress}
         onBack={() => setScreen('grades')}
-        onAnswer={handleQuizAnswer}
+        onAnswer={(answer) => handleQuizAnswer(selectedGrade.id, answer)}
         onComplete={handleQuizComplete}
       />
     );
