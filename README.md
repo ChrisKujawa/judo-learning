@@ -70,7 +70,7 @@ The app includes a web app manifest, app-owned icons, and a service worker scope
 | `npm run preview` | Preview the production build locally |
 | `npm test` | Run tests once |
 | `npm run test:watch` | Run tests in watch mode |
-| `npm run test:coverage` | Run tests with coverage |
+| `npm run test:coverage` | Run tests with coverage (CI requires at least 95% for every metric) |
 | `npm run lint` | Run ESLint |
 
 ---

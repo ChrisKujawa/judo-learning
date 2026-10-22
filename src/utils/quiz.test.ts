@@ -104,7 +104,10 @@ describe('adaptive quiz selection', () => {
   });
 
   it('uses progress weights when selecting the next technique', () => {
+    // Given
     const pool = makePool(2);
+
+    // When
     const selected = selectQuizTechniques(
       pool,
       { t0: { correctAnswers: 2, wrongAnswers: 0 } },
@@ -112,6 +115,7 @@ describe('adaptive quiz selection', () => {
       () => 0.2
     );
 
+    // Then
     expect(selected[0].id).toBe('t1');
   });
 });

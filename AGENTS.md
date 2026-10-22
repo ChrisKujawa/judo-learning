@@ -101,6 +101,10 @@ npm run test:coverage # Coverage report
 
 > **Rule:** Every new feature and every bug fix must include tests. No PR should be merged without corresponding test coverage for the changed behaviour.
 
+- Keep statement, branch, function, and line coverage as close to 100% as practical. CI enforces a minimum of 95% for every metric; do not add low-value tests solely to execute lines.
+- Structure non-trivial tests as **Given / When / Then**. Use comments to mark the phases when they are not already obvious from concise setup, action, and assertion blocks.
+- Cover relevant boundaries and failure paths, including unavailable browser APIs and storage failures, while asserting the user-visible fallback behaviour.
+
 All components use `data-testid` attributes for reliable test targeting:
 - `data-testid="grade-btn-{id}"` — grade buttons in GradeSelector
 - `data-testid="mode-btn-{mode}"` — mode buttons in ModeSelector

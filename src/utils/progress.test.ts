@@ -279,13 +279,17 @@ describe('progress aggregation', () => {
   });
 
   it('records quiz completion without counting its answers twice', () => {
+    // Given
     const quiz = makeCompletedQuiz();
     const withAnswers = quiz.answers.reduce(
       (progress, answer) => recordQuizAnswer(progress, { ...answer, gradeId: quiz.gradeId }),
       createEmptyProgress()
     );
+
+    // When
     const progress = recordCompletedQuiz(withAnswers, quiz);
 
+    // Then
     expect(progress.totalQuizzesCompleted).toBe(1);
     expect(progress.totalAnswers).toBe(3);
     expect(progress.totalCorrectAnswers).toBe(2);

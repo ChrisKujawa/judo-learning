@@ -170,12 +170,15 @@ describe('App – integration', () => {
   });
 
   it('persists an answer before the quiz is completed', async () => {
+    // Given
     const user = userEvent.setup();
     render(<App />);
 
+    // When
     await user.click(screen.getByTestId('grade-btn-kyu8'));
     await user.click(screen.getAllByTestId('choice-correct')[0]);
 
+    // Then
     expect(JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? '{}')).toMatchObject({
       totalQuizzesCompleted: 0,
       totalAnswers: 1,
@@ -191,6 +194,7 @@ describe('App – integration', () => {
   });
 
   it('continues the quiz when local progress cannot be persisted', async () => {
+    // Given
     const user = userEvent.setup();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(<App />);
@@ -204,9 +208,11 @@ describe('App – integration', () => {
       },
     });
 
+    // When
     await user.click(screen.getByTestId('grade-btn-kyu8'));
     await user.click(screen.getAllByTestId('choice-correct')[0]);
 
+    // Then
     expect(screen.getByTestId('score')).toHaveTextContent('1');
     expect(warn).toHaveBeenCalledWith(
       'Lernfortschritt konnte nicht gespeichert werden.',
