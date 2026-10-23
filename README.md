@@ -130,7 +130,7 @@ Renovate manages npm and GitHub Actions updates through `renovate.json`. Eligibl
 
 ### Usage analytics
 
-The production app uses GoatCounter for privacy-friendly analytics on the deployed GitHub Pages site. It records page views and custom events for Kyu selection, quiz starts, and quiz completions. Local development and tests do not load the analytics script.
+The production app uses GoatCounter for privacy-friendly analytics on the deployed GitHub Pages site. It records page views and custom events for Kyu selection, quiz starts and completions, opening app information, and following the feedback or repository links. Local development and tests do not load the analytics script.
 
 ---
 

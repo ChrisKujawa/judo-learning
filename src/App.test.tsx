@@ -75,32 +75,42 @@ describe('App – integration', () => {
     expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
   });
 
-  it('keeps app information directly accessible during a quiz and returns to it', async () => {
+  it('keeps an in-progress quiz mounted while app information is open', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByTestId('grade-btn-kyu8'));
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    await user.click(screen.getByTestId('next-btn'));
+    expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
+    expect(screen.getByTestId('score')).toHaveTextContent('1');
+
     await user.click(screen.getByTestId('open-info-floating-btn'));
 
     expect(screen.getByTestId('info-screen')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '← Zurück' }));
 
-    expect(screen.getByTestId('question')).toBeInTheDocument();
+    expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
+    expect(screen.getByTestId('score')).toHaveTextContent('1');
   });
 
-  it('keeps app information directly accessible from the glossary and returns to it', async () => {
+  it('keeps glossary detail state mounted while app information is open', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByTestId('open-glossary-btn'));
+    await user.click(screen.getByTestId('glossary-entry-o-goshi'));
+    expect(screen.getByRole('heading', { level: 1, name: 'O-Goshi' })).toBeInTheDocument();
+
     await user.click(screen.getByTestId('open-info-floating-btn'));
 
     expect(screen.getByTestId('info-screen')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '← Zurück' }));
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Judo-Lexikon' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'O-Goshi' })).toBeInTheDocument();
+    expect(screen.getByTestId('glossary-detail-back')).toBeInTheDocument();
   });
 
   it('shows progress counter after grade selection', async () => {

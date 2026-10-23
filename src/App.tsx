@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { trackAnalyticsEvent } from './analytics';
 import { GradeSelector } from './components/GradeSelector';
 import { Glossary } from './components/Glossary';
@@ -26,9 +26,18 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('grades');
   const [infoReturnScreen, setInfoReturnScreen] =
     useState<Exclude<Screen, 'info'>>('grades');
+  const infoReturnScrollY = useRef(0);
+  const restoreInfoReturnScroll = useRef(false);
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [progress, setProgress] = useState<ProgressStats>(() => loadProgress());
   const installPrompt = useInstallPrompt();
+
+  useLayoutEffect(() => {
+    if (screen !== 'info' && restoreInfoReturnScroll.current) {
+      window.scrollTo(0, infoReturnScrollY.current);
+      restoreInfoReturnScroll.current = false;
+    }
+  }, [screen]);
 
   function handleGradeSelect(grade: Grade) {
     trackAnalyticsEvent({
@@ -77,12 +86,18 @@ export default function App() {
   function handleOpenInfo() {
     if (screen !== 'info') {
       setInfoReturnScreen(screen);
+      infoReturnScrollY.current = window.scrollY;
     }
     trackAnalyticsEvent({
       path: 'info-opened',
       title: 'App information opened',
     });
     setScreen('info');
+  }
+
+  function handleCloseInfo() {
+    restoreInfoReturnScroll.current = true;
+    setScreen(infoReturnScreen);
   }
 
   function handleFeedback() {
@@ -99,9 +114,11 @@ export default function App() {
     });
   }
 
+  const activeScreen = screen === 'info' ? infoReturnScreen : screen;
+  const showFloatingInfo = activeScreen === 'quiz' || activeScreen === 'glossary';
   let content;
 
-  if (screen === 'quiz' && selectedGrade) {
+  if (activeScreen === 'quiz' && selectedGrade) {
     content = (
       <Quiz
         grade={selectedGrade}
@@ -111,16 +128,8 @@ export default function App() {
         onComplete={handleQuizComplete}
       />
     );
-  } else if (screen === 'glossary') {
+  } else if (activeScreen === 'glossary') {
     content = <Glossary techniques={ALL_TECHNIQUES} onBack={() => setScreen('grades')} />;
-  } else if (screen === 'info') {
-    content = (
-      <InfoScreen
-        onBack={() => setScreen(infoReturnScreen)}
-        onFeedback={handleFeedback}
-        onRepository={handleRepository}
-      />
-    );
   } else {
     content = (
       <GradeSelector
@@ -137,8 +146,20 @@ export default function App() {
 
   return (
     <>
-      {content}
-      {(screen === 'quiz' || screen === 'glossary') && (
+      <div
+        hidden={screen === 'info'}
+        className={showFloatingInfo ? 'pb-[calc(5rem+env(safe-area-inset-bottom))]' : undefined}
+      >
+        {content}
+      </div>
+      {screen === 'info' && (
+        <InfoScreen
+          onBack={handleCloseInfo}
+          onFeedback={handleFeedback}
+          onRepository={handleRepository}
+        />
+      )}
+      {screen !== 'info' && showFloatingInfo && (
         <button
           type="button"
           onClick={handleOpenInfo}
