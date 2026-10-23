@@ -95,8 +95,9 @@ export function InfoScreen({ onBack, onFeedback, onRepository }: InfoScreenProps
 
           <h3 className="mt-4 font-bold text-gray-800">Lernfortschritt</h3>
           <p className="mt-1 text-sm leading-6 text-gray-600">
-            Dein Lernfortschritt wird ausschließlich im lokalen Speicher deines Browsers
-            gespeichert. Du kannst ihn auf der Startseite jederzeit löschen.
+            Deine detaillierten Lernstände, Antworten und Ergebnisse werden ausschließlich im
+            lokalen Speicher deines Browsers gespeichert. Du kannst sie auf der Startseite
+            jederzeit löschen.
           </p>
 
           <h3 className="mt-4 font-bold text-gray-800">Hosting über GitHub Pages</h3>
@@ -118,9 +119,10 @@ export function InfoScreen({ onBack, onFeedback, onRepository }: InfoScreenProps
           <h3 className="mt-4 font-bold text-gray-800">Reichweitenmessung mit GoatCounter</h3>
           <p className="mt-1 text-sm leading-6 text-gray-600">
             GoatCounter zählt Seitenaufrufe und ausgewählte Nutzungsvorgänge in zusammengefasster
-            Form. Der Dienst setzt keine Cookies und speichert weder IP-Adressen noch dauerhafte
-            Nutzerkennungen. Die Verarbeitung erfolgt auf Servern in Deutschland und Finnland.
-            Details beschreibt die{' '}
+            Form. Dazu gehören der ausgewählte Kyu-Grad sowie Start und Abschluss eines Quiz.
+            Einzelne Antworten und das Ergebnis werden nicht übertragen. Der Dienst setzt keine
+            Cookies und speichert weder IP-Adressen noch dauerhafte Nutzerkennungen. Die
+            Verarbeitung erfolgt auf Servern in Deutschland und Finnland. Details beschreibt die{' '}
             <a
               href="https://www.goatcounter.com/help/privacy"
               target="_blank"

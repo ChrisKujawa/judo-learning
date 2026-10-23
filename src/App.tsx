@@ -66,7 +66,7 @@ export default function App() {
     });
     trackAnalyticsEvent({
       path: `quiz-finished-${quiz.gradeId}`,
-      title: `Quiz finished: ${quiz.gradeName} (${Math.round((quiz.score / quiz.totalQuestions) * 100)}%)`,
+      title: `Quiz finished: ${quiz.gradeName}`,
     });
   }
 

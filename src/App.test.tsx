@@ -325,7 +325,7 @@ describe('App – integration', () => {
 
     expect(trackAnalyticsEvent).toHaveBeenCalledWith({
       path: 'quiz-finished-kyu8',
-      title: 'Quiz finished: 8. Kyu – Weiß-Gelb (100%)',
+      title: 'Quiz finished: 8. Kyu – Weiß-Gelb',
     });
   });
 

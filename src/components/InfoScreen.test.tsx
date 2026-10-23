@@ -22,6 +22,9 @@ describe('InfoScreen', () => {
     expect(screen.getByTestId('privacy-notice')).toHaveTextContent(
       'Reichweitenmessung mit GoatCounter'
     );
+    expect(screen.getByTestId('privacy-notice')).toHaveTextContent(
+      'Einzelne Antworten und das Ergebnis werden nicht übertragen'
+    );
     expect(screen.getByTestId('privacy-notice')).toHaveTextContent('Christopher Kujawa');
     expect(screen.getByTestId('imprint')).toHaveTextContent('Christopher Kujawa');
     expect(screen.getByTestId('imprint')).toHaveTextContent('c/o Sport-Dojo Berlin e.V.');
