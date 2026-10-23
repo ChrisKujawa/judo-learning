@@ -25,6 +25,18 @@ describe('InfoScreen', () => {
     expect(screen.getByTestId('privacy-notice')).toHaveTextContent(
       'Einzelne Antworten und das Ergebnis werden nicht übertragen'
     );
+    expect(screen.getByTestId('privacy-notice')).toHaveTextContent(
+      'Aufruf dieser Informationsseite und das Öffnen der Feedback- und Repository-Links'
+    );
+    expect(screen.getByTestId('privacy-notice')).toHaveTextContent(
+      'Bilder von Wikimedia Commons'
+    );
+    expect(
+      screen.getByRole('link', { name: 'Datenschutzerklärung der Wikimedia Foundation' })
+    ).toHaveAttribute(
+      'href',
+      'https://foundation.wikimedia.org/wiki/Policy:Privacy_policy/de'
+    );
     expect(screen.getByTestId('privacy-notice')).toHaveTextContent('Christopher Kujawa');
     expect(screen.getByTestId('imprint')).toHaveTextContent('Christopher Kujawa');
     expect(screen.getByTestId('imprint')).toHaveTextContent('c/o Sport-Dojo Berlin e.V.');

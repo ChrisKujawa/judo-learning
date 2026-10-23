@@ -120,9 +120,11 @@ export function InfoScreen({ onBack, onFeedback, onRepository }: InfoScreenProps
           <p className="mt-1 text-sm leading-6 text-gray-600">
             GoatCounter zählt Seitenaufrufe und ausgewählte Nutzungsvorgänge in zusammengefasster
             Form. Dazu gehören der ausgewählte Kyu-Grad sowie Start und Abschluss eines Quiz.
-            Einzelne Antworten und das Ergebnis werden nicht übertragen. Der Dienst setzt keine
-            Cookies und speichert weder IP-Adressen noch dauerhafte Nutzerkennungen. Die
-            Verarbeitung erfolgt auf Servern in Deutschland und Finnland. Details beschreibt die{' '}
+            Ebenfalls gezählt werden der Aufruf dieser Informationsseite und das Öffnen der
+            Feedback- und Repository-Links. Einzelne Antworten und das Ergebnis werden nicht
+            übertragen. Der Dienst setzt keine Cookies und speichert weder IP-Adressen noch
+            dauerhafte Nutzerkennungen. Die Verarbeitung erfolgt auf Servern in Deutschland und
+            Finnland. Details beschreibt die{' '}
             <a
               href="https://www.goatcounter.com/help/privacy"
               target="_blank"
@@ -130,6 +132,23 @@ export function InfoScreen({ onBack, onFeedback, onRepository }: InfoScreenProps
               className="font-semibold text-blue-700 underline"
             >
               Datenschutzerklärung von GoatCounter
+            </a>
+            .
+          </p>
+
+          <h3 className="mt-4 font-bold text-gray-800">Bilder von Wikimedia Commons</h3>
+          <p className="mt-1 text-sm leading-6 text-gray-600">
+            Technikbilder werden direkt von Wikimedia Commons geladen. Beim Anzeigen stellt dein
+            Browser eine Verbindung zu Wikimedia her und übermittelt technisch notwendige
+            Verbindungsdaten, beispielsweise die IP-Adresse. Weitere Informationen findest du in
+            der{' '}
+            <a
+              href="https://foundation.wikimedia.org/wiki/Policy:Privacy_policy/de"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-blue-700 underline"
+            >
+              Datenschutzerklärung der Wikimedia Foundation
             </a>
             .
           </p>

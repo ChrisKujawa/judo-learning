@@ -151,7 +151,11 @@ export default function App() {
     <>
       <div
         hidden={screen === 'info'}
-        className={showFloatingInfo ? 'pb-[calc(5rem+env(safe-area-inset-bottom))]' : undefined}
+        className={
+          showFloatingInfo
+            ? '[&>*]:pb-[calc(5rem+env(safe-area-inset-bottom))]'
+            : undefined
+        }
       >
         {content}
       </div>
