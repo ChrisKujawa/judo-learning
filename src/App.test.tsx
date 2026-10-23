@@ -91,6 +91,29 @@ describe('App – integration', () => {
     expect(opener).toHaveFocus();
   });
 
+  it('restores the previous nonzero scroll position after app information', async () => {
+    // Given
+    const user = userEvent.setup();
+    const originalScrollY = window.scrollY;
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 420 });
+
+    try {
+      render(<App />);
+
+      // When
+      await user.click(screen.getByTestId('open-info-btn'));
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: 80 });
+      await user.click(screen.getByRole('button', { name: '← Zurück' }));
+
+      // Then
+      expect(scrollTo).toHaveBeenLastCalledWith(0, 420);
+    } finally {
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: originalScrollY });
+      scrollTo.mockRestore();
+    }
+  });
+
   it('keeps an in-progress quiz mounted while app information is open', async () => {
     const user = userEvent.setup();
     render(<App />);
