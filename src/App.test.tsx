@@ -45,6 +45,118 @@ describe('App – integration', () => {
     expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
   });
 
+  it('opens app information, tracks its links, and returns home', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('open-info-btn'));
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'info-opened',
+      title: 'App information opened',
+    });
+
+    screen.getByTestId('feedback-link').addEventListener('click', (event) => event.preventDefault());
+    screen.getByTestId('repository-link').addEventListener('click', (event) => event.preventDefault());
+    await user.click(screen.getByTestId('feedback-link'));
+    await user.click(screen.getByTestId('repository-link'));
+
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'feedback-opened',
+      title: 'Feedback opened',
+    });
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'repository-opened',
+      title: 'Repository opened',
+    });
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+    expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
+  });
+
+  it('restores keyboard focus to the home information opener', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const opener = screen.getByTestId('open-info-btn');
+    opener.focus();
+
+    await user.keyboard('{Enter}');
+
+    const backButton = screen.getByRole('button', { name: '← Zurück' });
+    expect(backButton).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+
+    expect(opener).toHaveFocus();
+  });
+
+  it('restores the previous nonzero scroll position after app information', async () => {
+    // Given
+    const user = userEvent.setup();
+    const originalScrollY = window.scrollY;
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 420 });
+
+    try {
+      render(<App />);
+
+      // When
+      await user.click(screen.getByTestId('open-info-btn'));
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: 80 });
+      await user.click(screen.getByRole('button', { name: '← Zurück' }));
+
+      // Then
+      expect(scrollTo).toHaveBeenLastCalledWith(0, 420);
+    } finally {
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: originalScrollY });
+      scrollTo.mockRestore();
+    }
+  });
+
+  it('keeps an in-progress quiz mounted while app information is open', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+    await user.click(screen.getAllByTestId('choice-correct')[0]);
+    await user.click(screen.getByTestId('next-btn'));
+    expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
+    expect(screen.getByTestId('score')).toHaveTextContent('1');
+
+    const opener = screen.getByTestId('open-info-floating-btn');
+    opener.focus();
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+
+    const backButton = screen.getByRole('button', { name: '← Zurück' });
+    expect(backButton).toHaveFocus();
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
+    expect(screen.getByTestId('score')).toHaveTextContent('1');
+    expect(screen.getByTestId('open-info-floating-btn')).toHaveFocus();
+  });
+
+  it('keeps glossary detail state mounted while app information is open', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('open-glossary-btn'));
+    await user.click(screen.getByTestId('glossary-entry-o-goshi'));
+    expect(screen.getByRole('heading', { level: 1, name: 'O-Goshi' })).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('open-info-floating-btn'));
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+
+    expect(screen.getByRole('heading', { level: 1, name: 'O-Goshi' })).toBeInTheDocument();
+    expect(screen.getByTestId('glossary-detail-back')).toBeInTheDocument();
+  });
+
   it('shows progress counter after grade selection', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -236,7 +348,7 @@ describe('App – integration', () => {
 
     expect(trackAnalyticsEvent).toHaveBeenCalledWith({
       path: 'quiz-finished-kyu8',
-      title: 'Quiz finished: 8. Kyu – Weiß-Gelb (100%)',
+      title: 'Quiz finished: 8. Kyu – Weiß-Gelb',
     });
   });
 
