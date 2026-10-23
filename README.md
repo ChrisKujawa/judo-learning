@@ -19,6 +19,7 @@ The app UI and quiz content are in German. Japanese terms are used as prompts, a
 - **Immediate feedback** after each answer, including teaching hints
 - **Score summary** at the end of every quiz round with emoji feedback
 - **Searchable Judo glossary** with category and Kyu filters plus detailed reference views
+- In-app feedback, source repository, privacy, and legal information
 - Installable as a mobile PWA with app-owned icons and standalone launch
 - Offline-capable after the app has been opened once online
 
@@ -82,6 +83,7 @@ src/
 ├── components/
 │   ├── GradeSelector.tsx   # Belt grade selection screen
 │   ├── Glossary.tsx        # Searchable technique and terminology reference
+│   ├── InfoScreen.tsx      # Feedback, source, privacy, and legal information
 │   ├── InstallPrompt.tsx   # Install prompt for supported browsers
 │   └── Quiz.tsx            # Main quiz logic and score screen
 ├── data/

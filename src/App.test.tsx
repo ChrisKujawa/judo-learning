@@ -45,6 +45,64 @@ describe('App – integration', () => {
     expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
   });
 
+  it('opens app information, tracks its links, and returns home', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('open-info-btn'));
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'info-opened',
+      title: 'App information opened',
+    });
+
+    screen.getByTestId('feedback-link').addEventListener('click', (event) => event.preventDefault());
+    screen.getByTestId('repository-link').addEventListener('click', (event) => event.preventDefault());
+    await user.click(screen.getByTestId('feedback-link'));
+    await user.click(screen.getByTestId('repository-link'));
+
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'feedback-opened',
+      title: 'Feedback opened',
+    });
+    expect(trackAnalyticsEvent).toHaveBeenCalledWith({
+      path: 'repository-opened',
+      title: 'Repository opened',
+    });
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+    expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
+  });
+
+  it('keeps app information directly accessible during a quiz and returns to it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('grade-btn-kyu8'));
+    await user.click(screen.getByTestId('open-info-floating-btn'));
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+
+    expect(screen.getByTestId('question')).toBeInTheDocument();
+  });
+
+  it('keeps app information directly accessible from the glossary and returns to it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByTestId('open-glossary-btn'));
+    await user.click(screen.getByTestId('open-info-floating-btn'));
+
+    expect(screen.getByTestId('info-screen')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Judo-Lexikon' })).toBeInTheDocument();
+  });
+
   it('shows progress counter after grade selection', async () => {
     const user = userEvent.setup();
     render(<App />);

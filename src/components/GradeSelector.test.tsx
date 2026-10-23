@@ -86,6 +86,16 @@ describe('GradeSelector', () => {
     expect(onOpenGlossary).toHaveBeenCalledOnce();
   });
 
+  it('opens app information from the home screen', async () => {
+    const user = userEvent.setup();
+    const onOpenInfo = vi.fn();
+    render(<GradeSelector grades={[]} onSelect={vi.fn()} onOpenInfo={onOpenInfo} />);
+
+    await user.click(screen.getByTestId('open-info-btn'));
+
+    expect(onOpenInfo).toHaveBeenCalledOnce();
+  });
+
   it('renders no grade buttons when grades array is empty', () => {
     render(<GradeSelector grades={[]} onSelect={vi.fn()} />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();

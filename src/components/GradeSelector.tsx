@@ -9,6 +9,7 @@ interface GradeSelectorProps {
   installPrompt?: InstallPromptControls;
   onSelect: (grade: Grade) => void;
   onOpenGlossary?: () => void;
+  onOpenInfo?: () => void;
   onResetProgress?: () => void;
 }
 
@@ -18,6 +19,7 @@ export function GradeSelector({
   installPrompt,
   onSelect,
   onOpenGlossary,
+  onOpenInfo,
   onResetProgress,
 }: GradeSelectorProps) {
   const hasProgress = progress
@@ -146,6 +148,17 @@ export function GradeSelector({
           );
         })}
       </div>
+
+      {onOpenInfo && (
+        <button
+          type="button"
+          onClick={onOpenInfo}
+          className="mt-8 text-sm font-semibold text-gray-600 underline decoration-gray-300 underline-offset-4"
+          data-testid="open-info-btn"
+        >
+          Über die App, Feedback &amp; Datenschutz
+        </button>
+      )}
     </div>
   );
 }
