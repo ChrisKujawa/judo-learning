@@ -75,6 +75,22 @@ describe('App – integration', () => {
     expect(screen.getByText('Judo Lernen')).toBeInTheDocument();
   });
 
+  it('restores keyboard focus to the home information opener', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const opener = screen.getByTestId('open-info-btn');
+    opener.focus();
+
+    await user.keyboard('{Enter}');
+
+    const backButton = screen.getByRole('button', { name: '← Zurück' });
+    expect(backButton).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+
+    expect(opener).toHaveFocus();
+  });
+
   it('keeps an in-progress quiz mounted while app information is open', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -85,14 +101,19 @@ describe('App – integration', () => {
     expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
     expect(screen.getByTestId('score')).toHaveTextContent('1');
 
-    await user.click(screen.getByTestId('open-info-floating-btn'));
+    const opener = screen.getByTestId('open-info-floating-btn');
+    opener.focus();
+    await user.keyboard('{Enter}');
 
     expect(screen.getByTestId('info-screen')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: '← Zurück' }));
+    const backButton = screen.getByRole('button', { name: '← Zurück' });
+    expect(backButton).toHaveFocus();
+    await user.keyboard('{Enter}');
 
     expect(screen.getByTestId('progress')).toHaveTextContent(`2 / ${QUIZ_QUESTION_LIMIT}`);
     expect(screen.getByTestId('score')).toHaveTextContent('1');
+    expect(screen.getByTestId('open-info-floating-btn')).toHaveFocus();
   });
 
   it('keeps glossary detail state mounted while app information is open', async () => {

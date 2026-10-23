@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 export const REPOSITORY_URL = 'https://github.com/ChrisKujawa/judo-learning';
 export const CONTACT_EMAIL = 'zelldon91 [at] gmail.com';
@@ -12,14 +12,22 @@ interface InfoScreenProps {
 }
 
 export function InfoScreen({ onBack, onFeedback, onRepository }: InfoScreenProps) {
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
+    backButtonRef.current?.focus({ preventScroll: true });
   }, []);
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 py-8" data-testid="info-screen">
       <div className="mx-auto max-w-2xl">
-        <button type="button" onClick={onBack} className="mb-6 font-semibold text-blue-700">
+        <button
+          ref={backButtonRef}
+          type="button"
+          onClick={onBack}
+          className="mb-6 font-semibold text-blue-700"
+        >
           ← Zurück
         </button>
 

@@ -4,12 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { CONTACT_EMAIL, FEEDBACK_URL, InfoScreen, REPOSITORY_URL } from './InfoScreen';
 
 describe('InfoScreen', () => {
-  it('starts at the top so feedback is immediately visible', () => {
+  it('starts at the top with back navigation focused', () => {
     const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
 
     render(<InfoScreen onBack={vi.fn()} />);
 
     expect(scrollTo).toHaveBeenCalledWith(0, 0);
+    expect(screen.getByRole('button', { name: '← Zurück' })).toHaveFocus();
     scrollTo.mockRestore();
   });
 

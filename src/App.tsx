@@ -28,6 +28,7 @@ export default function App() {
     useState<Exclude<Screen, 'info'>>('grades');
   const infoReturnScrollY = useRef(0);
   const restoreInfoReturnScroll = useRef(false);
+  const infoOpenerRef = useRef<HTMLButtonElement>(null);
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [progress, setProgress] = useState<ProgressStats>(() => loadProgress());
   const installPrompt = useInstallPrompt();
@@ -35,6 +36,7 @@ export default function App() {
   useLayoutEffect(() => {
     if (screen !== 'info' && restoreInfoReturnScroll.current) {
       window.scrollTo(0, infoReturnScrollY.current);
+      infoOpenerRef.current?.focus({ preventScroll: true });
       restoreInfoReturnScroll.current = false;
     }
   }, [screen]);
@@ -139,6 +141,7 @@ export default function App() {
         onSelect={handleGradeSelect}
         onOpenGlossary={() => setScreen('glossary')}
         onOpenInfo={handleOpenInfo}
+        infoButtonRef={infoOpenerRef}
         onResetProgress={handleResetProgress}
       />
     );
@@ -161,6 +164,7 @@ export default function App() {
       )}
       {screen !== 'info' && showFloatingInfo && (
         <button
+          ref={infoOpenerRef}
           type="button"
           onClick={handleOpenInfo}
           className="fixed bottom-4 right-4 z-50 rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-lg"

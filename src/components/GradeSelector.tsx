@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import type { Grade } from '../data/types';
 import { calculateAccuracy, type ProgressStats } from '../utils/progress';
 import type { InstallPromptControls } from '../hooks/useInstallPrompt';
@@ -10,6 +11,7 @@ interface GradeSelectorProps {
   onSelect: (grade: Grade) => void;
   onOpenGlossary?: () => void;
   onOpenInfo?: () => void;
+  infoButtonRef?: Ref<HTMLButtonElement>;
   onResetProgress?: () => void;
 }
 
@@ -20,6 +22,7 @@ export function GradeSelector({
   onSelect,
   onOpenGlossary,
   onOpenInfo,
+  infoButtonRef,
   onResetProgress,
 }: GradeSelectorProps) {
   const hasProgress = progress
@@ -151,6 +154,7 @@ export function GradeSelector({
 
       {onOpenInfo && (
         <button
+          ref={infoButtonRef}
           type="button"
           onClick={onOpenInfo}
           className="mt-8 text-sm font-semibold text-gray-600 underline decoration-gray-300 underline-offset-4"
